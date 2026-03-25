@@ -1,0 +1,998 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>ARCHER</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Instrument+Sans:wght@300;400;500&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0f0f11;--surface:#17171a;--surface2:#1e1e23;--surface3:#26262d;
+  --border:#2e2e38;--border2:#3a3a48;
+  --text:#eeeef0;--text2:#9191a0;--text3:#5a5a6a;
+  --accent:#7c6cfc;--accent-soft:rgba(124,108,252,.12);
+  --green:#3ecf8e;--green-soft:rgba(62,207,142,.12);
+  --amber:#f5a623;--amber-soft:rgba(245,166,35,.12);
+  --red:#f25c5c;--red-soft:rgba(242,92,92,.12);
+  --blue:#4da6ff;--blue-soft:rgba(77,166,255,.12);
+  --purple:#c084fc;--purple-soft:rgba(192,132,252,.12);
+  --clase:#4da6ff;--laboratorio:#c084fc;--parcial:#f25c5c;
+  --trabajo:#f5a623;--especial:#3ecf8e;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Instrument Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;}
+
+/* ══ LOGIN ══ */
+#login-screen{min-height:100vh;display:flex;align-items:center;justify-content:center;position:relative;padding:1rem;}
+.login-bg{position:absolute;inset:0;background:radial-gradient(ellipse 60% 50% at 20% 30%,rgba(124,108,252,.15) 0%,transparent 60%),radial-gradient(ellipse 40% 40% at 80% 70%,rgba(62,207,142,.08) 0%,transparent 60%);pointer-events:none;}
+.login-card{position:relative;width:420px;max-width:100%;background:var(--surface);border:1px solid var(--border);padding:2.2rem;border-radius:2px;}
+.login-logo{font-family:'Syne',sans-serif;font-size:2.2rem;font-weight:800;letter-spacing:-.04em;margin-bottom:.3rem;}
+.login-logo em{font-style:normal;color:var(--accent);}
+.login-tagline{font-size:.62rem;color:var(--text3);letter-spacing:.06em;line-height:1.5;margin-bottom:1.8rem;}
+.login-tagline strong{color:var(--text2);font-weight:400;}
+
+/* Profile selector */
+.profile-section{display:none;}
+.profile-label{font-size:.68rem;text-transform:uppercase;letter-spacing:.1em;color:var(--text3);margin-bottom:.7rem;}
+.profile-btn{width:100%;display:flex;align-items:center;gap:.75rem;background:var(--surface2);border:1px solid var(--border);padding:.75rem 1rem;cursor:pointer;transition:border-color .15s,background .15s;margin-bottom:.5rem;border-radius:1px;}
+.profile-btn:hover{border-color:var(--accent);background:var(--surface3);}
+.profile-avatar{width:34px;height:34px;border-radius:50%;background:var(--accent-soft);border:1px solid var(--accent);display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-size:.85rem;font-weight:700;color:var(--accent);flex-shrink:0;}
+.profile-name{font-size:.88rem;color:var(--text);font-weight:500;}
+.profile-hint{font-size:.63rem;color:var(--text3);margin-top:.1rem;}
+
+/* New user form */
+.new-user-section{display:none;}
+.field{margin-bottom:.85rem;}
+.field label{display:block;font-size:.66rem;text-transform:uppercase;letter-spacing:.1em;color:var(--text3);margin-bottom:.32rem;}
+.field input{width:100%;background:var(--surface2);border:1px solid var(--border);color:var(--text);padding:.62rem .85rem;font-family:'Instrument Sans',sans-serif;font-size:.88rem;outline:none;border-radius:1px;transition:border-color .15s;}
+.field input:focus{border-color:var(--accent);}
+.field input::placeholder{color:var(--text3);}
+.btn-main{width:100%;padding:.72rem;background:var(--accent);color:#fff;border:none;font-family:'Syne',sans-serif;font-size:.8rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;border-radius:1px;transition:opacity .15s,transform .1s;margin-top:.25rem;}
+.btn-main:hover{opacity:.88;}
+.btn-main:active{transform:scale(.99);}
+.divider{display:flex;align-items:center;gap:.8rem;margin:1.1rem 0;color:var(--text3);font-size:.7rem;letter-spacing:.06em;}
+.divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--border);}
+.btn-ghost{width:100%;padding:.62rem;background:transparent;border:1px solid var(--border2);color:var(--text2);font-family:'Instrument Sans',sans-serif;font-size:.78rem;cursor:pointer;border-radius:1px;transition:all .15s;}
+.btn-ghost:hover{border-color:var(--accent);color:var(--accent);}
+.admin-form{margin-top:.75rem;display:none;}
+.error{font-size:.7rem;color:var(--red);margin-top:.28rem;display:none;}
+
+/* Connecting state */
+.connecting-state{text-align:center;padding:2rem 0;}
+.connecting-spinner{width:28px;height:28px;border:2px solid var(--border2);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto .8rem;}
+@keyframes spin{to{transform:rotate(360deg)}}
+.connecting-text{font-size:.75rem;color:var(--text3);letter-spacing:.05em;}
+
+/* ══ APP ══ */
+#app{display:none;}
+.topbar{position:sticky;top:0;z-index:200;background:rgba(15,15,17,.96);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);min-height:54px;display:flex;align-items:center;flex-wrap:wrap;gap:.5rem;padding:.6rem 1rem;}
+.topbar-left{display:flex;align-items:center;gap:.6rem;flex-shrink:0;}
+.topbar-logo{font-family:'Syne',sans-serif;font-weight:800;font-size:1.1rem;letter-spacing:-.03em;white-space:nowrap;color:var(--text);}
+.topbar-logo em{font-style:normal;color:var(--accent);}
+.sync-wrap{display:flex;align-items:center;gap:.35rem;}
+.sync-dot{width:6px;height:6px;border-radius:50%;background:var(--green);animation:pulse 2s infinite;}
+.sync-dot.offline{background:var(--amber);}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.sync-label{font-size:.6rem;color:var(--text3);}
+.topbar-spacer{flex:1;min-width:.5rem;}
+.topbar-right{display:flex;align-items:center;gap:.4rem;flex-wrap:wrap;}
+.user-chip{display:flex;align-items:center;gap:.4rem;background:var(--surface2);border:1px solid var(--border);padding:.25rem .6rem;border-radius:100px;font-size:.7rem;color:var(--text2);max-width:140px;overflow:hidden;}
+.user-chip span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.role-dot{width:6px;height:6px;border-radius:50%;background:var(--accent);flex-shrink:0;}
+.role-dot.admin{background:var(--red);}
+.btn-sm{padding:.3rem .65rem;background:transparent;border:1px solid var(--border2);color:var(--text2);font-size:.68rem;cursor:pointer;border-radius:1px;transition:all .15s;font-family:'Instrument Sans',sans-serif;white-space:nowrap;}
+.btn-sm:hover{border-color:var(--text2);color:var(--text);}
+
+/* ══ WEEK BAR ══ */
+.week-bar{background:var(--surface);border-bottom:1px solid var(--border);padding:.6rem 1rem;display:flex;align-items:center;gap:.7rem;flex-wrap:wrap;}
+.week-select-wrap{display:flex;align-items:center;gap:.45rem;}
+.week-select-wrap label{font-size:.66rem;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);white-space:nowrap;}
+select{background:var(--surface2);border:1px solid var(--border);color:var(--text);padding:.4rem 1.8rem .4rem .7rem;font-family:'Instrument Sans',sans-serif;font-size:.82rem;outline:none;border-radius:1px;cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%235a5a6a'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right .6rem center;transition:border-color .15s;}
+select:focus{border-color:var(--accent);}
+.week-nav-btns{display:flex;gap:.25rem;}
+.btn-nav{width:28px;height:28px;background:var(--surface2);border:1px solid var(--border);color:var(--text2);font-size:.82rem;cursor:pointer;border-radius:1px;transition:all .15s;display:flex;align-items:center;justify-content:center;}
+.btn-nav:hover{border-color:var(--accent);color:var(--accent);}
+.admin-week-controls{display:none;align-items:center;gap:.45rem;margin-left:auto;flex-wrap:wrap;}
+.inline-input{background:var(--surface2);border:1px solid var(--border);color:var(--text);padding:.36rem .6rem;font-family:'Instrument Sans',sans-serif;font-size:.78rem;outline:none;border-radius:1px;width:145px;transition:border-color .15s;}
+.inline-input:focus{border-color:var(--accent);}
+.inline-input::placeholder{color:var(--text3);}
+.btn-accent-sm{padding:.36rem .75rem;background:var(--accent);border:none;color:#fff;font-family:'Syne',sans-serif;font-size:.68rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;border-radius:1px;transition:opacity .15s;white-space:nowrap;}
+.btn-accent-sm:hover{opacity:.85;}
+
+/* ══ ADMIN PANEL ══ */
+.admin-panel{display:none;background:var(--surface);border-bottom:1px solid var(--border);padding:1rem 1.1rem;}
+.admin-panel-header{font-family:'Syne',sans-serif;font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--red);margin-bottom:.85rem;display:flex;align-items:center;justify-content:space-between;gap:.5rem;flex-wrap:wrap;}
+.admin-tabs{display:flex;gap:.3rem;}
+.admin-tab{padding:.28rem .7rem;background:transparent;border:1px solid var(--border2);color:var(--text3);font-family:'Syne',sans-serif;font-size:.62rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;border-radius:1px;transition:all .15s;}
+.admin-tab.active{background:var(--accent);border-color:var(--accent);color:#fff;}
+.admin-tab-panel{display:none;}
+.admin-tab-panel.active{display:block;}
+.form-row-full{margin-bottom:.55rem;}
+.form-grid-3x2{display:grid;grid-template-columns:repeat(3,1fr);gap:.55rem;margin-bottom:.55rem;align-items:end;}
+.form-grid-bottom{display:grid;grid-template-columns:1fr auto;gap:.55rem;align-items:end;margin-bottom:.55rem;}
+.form-grid-subjects{display:grid;grid-template-columns:1fr auto;gap:.55rem;align-items:end;}
+.form-field label{display:block;font-size:.6rem;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);margin-bottom:.25rem;}
+.form-field input,.form-field select,.form-field textarea{width:100%;background:var(--surface2);border:1px solid var(--border);color:var(--text);padding:.46rem .62rem;font-family:'Instrument Sans',sans-serif;font-size:.8rem;outline:none;border-radius:1px;transition:border-color .15s;}
+.form-field textarea{resize:vertical;min-height:60px;line-height:1.4;}
+.form-field input:focus,.form-field select:focus,.form-field textarea:focus{border-color:var(--accent);}
+.form-field input::placeholder,.form-field textarea::placeholder{color:var(--text3);}
+.btn-add-event{padding:.46rem 1.1rem;background:var(--accent);border:none;color:#fff;font-family:'Syne',sans-serif;font-size:.7rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;border-radius:1px;transition:opacity .15s;white-space:nowrap;align-self:end;height:100%;}
+.btn-add-event:hover{opacity:.85;}
+.subjects-list{display:flex;flex-wrap:wrap;gap:.4rem;margin-top:.6rem;}
+.subject-chip{display:flex;align-items:center;gap:.35rem;background:var(--surface2);border:1px solid var(--border2);padding:.28rem .55rem .28rem .65rem;border-radius:100px;font-size:.72rem;color:var(--text2);}
+.subject-chip button{background:transparent;border:none;color:var(--text3);font-size:.65rem;cursor:pointer;line-height:1;padding:0;transition:color .12s;}
+.subject-chip button:hover{color:var(--red);}
+.subjects-empty{font-size:.72rem;color:var(--text3);margin-top:.5rem;font-style:italic;}
+
+/* ══ CALENDAR ══ */
+.calendar-wrap{overflow-x:auto;padding:.9rem 1rem;min-height:calc(100vh - 160px);}
+.calendar-grid{display:grid;grid-template-columns:repeat(7,minmax(152px,1fr));gap:1px;background:var(--border);border:1px solid var(--border);min-width:840px;}
+.day-col{background:var(--surface);display:flex;flex-direction:column;}
+.day-header{padding:.6rem .7rem .5rem;background:var(--surface2);border-bottom:1px solid var(--border);position:sticky;top:54px;z-index:5;}
+.day-name{font-family:'Syne',sans-serif;font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--text2);}
+.day-stats{font-size:.6rem;color:var(--text3);margin-top:.1rem;line-height:1.4;}
+.day-pending{color:var(--amber);}
+.day-done{color:var(--green);}
+.day-events{padding:5rem .55rem .65rem;flex:1;display:flex;flex-direction:column;gap:.5rem;min-height:220px;align-items:stretch;}
+.day-empty{flex:1;display:flex;align-items:center;justify-content:center;color:var(--text3);font-size:.66rem;opacity:.4;padding:1rem 0;}
+
+/* ══ EVENT CARD ══ */
+.event-card{background:var(--surface2);border:1px solid var(--border);border-top:3px solid var(--border);border-radius:1px;padding:.72rem .72rem .6rem;position:relative;transition:border-color .15s,box-shadow .15s;animation:slideIn .18s ease both;width:100%;overflow:hidden;}
+.event-card:hover{border-color:var(--border2);box-shadow:0 4px 16px rgba(0,0,0,.3);}
+.event-card[data-type="clase"]{border-top-color:var(--clase);}
+.event-card[data-type="laboratorio"]{border-top-color:var(--laboratorio);}
+.event-card[data-type="parcial"]{border-top-color:var(--parcial);}
+.event-card[data-type="trabajo"]{border-top-color:var(--trabajo);}
+.event-card[data-type="especial"]{border-top-color:var(--especial);}
+.card-top{display:flex;align-items:center;justify-content:space-between;gap:.3rem;padding-right:2.8rem;}
+.event-type-pill{display:inline-flex;align-items:center;font-size:.56rem;font-weight:600;text-transform:uppercase;letter-spacing:.07em;padding:.12rem .4rem;border-radius:100px;flex-shrink:0;}
+.pill-clase{background:var(--blue-soft);color:var(--blue);}
+.pill-laboratorio{background:var(--purple-soft);color:var(--purple);}
+.pill-parcial{background:var(--red-soft);color:var(--red);}
+.pill-trabajo{background:var(--amber-soft);color:var(--amber);}
+.pill-especial{background:var(--green-soft);color:var(--green);}
+.toggle-arrow{font-size:.55rem;color:var(--text3);cursor:pointer;transition:transform .2s;flex-shrink:0;padding:.1rem .15rem;border-radius:2px;}
+.toggle-arrow:hover{color:var(--text2);}
+.toggle-arrow.open{transform:rotate(180deg);}
+.event-title-text{font-family:'Instrument Serif',serif;font-size:.86rem;line-height:1.3;color:var(--text);margin-top:.3rem;overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;word-break:break-word;}
+.event-subject{font-size:.68rem;color:var(--text3);margin-top:.15rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.event-detail{overflow:hidden;max-height:0;opacity:0;transition:max-height .28s ease,opacity .22s ease;}
+.event-detail.open{max-height:400px;opacity:1;}
+.detail-row{font-size:.67rem;color:var(--text3);display:flex;align-items:flex-start;gap:.28rem;margin-top:.18rem;}
+.detail-divider{height:1px;background:var(--border);margin:.4rem 0;}
+.desc-toggle{display:flex;align-items:center;gap:.35rem;cursor:pointer;margin-top:.35rem;}
+.desc-toggle-label{font-size:.62rem;text-transform:uppercase;letter-spacing:.07em;color:var(--text3);}
+.desc-toggle-arrow{font-size:.5rem;color:var(--text3);transition:transform .18s;}
+.desc-toggle-arrow.open{transform:rotate(180deg);}
+.desc-body{overflow:hidden;max-height:0;opacity:0;transition:max-height .22s ease,opacity .18s ease;}
+.desc-body.open{max-height:300px;opacity:1;}
+.detail-desc{font-size:.72rem;color:var(--text2);line-height:1.5;margin-top:.3rem;white-space:pre-wrap;word-break:break-word;}
+.status-row{display:flex;gap:.25rem;margin-top:.5rem;}
+.status-pill{flex:1;padding:.24rem 0;text-align:center;font-size:.56rem;font-weight:500;text-transform:uppercase;letter-spacing:.05em;border:1px solid var(--border);background:transparent;color:var(--text3);cursor:pointer;border-radius:100px;transition:all .12s;font-family:'Instrument Sans',sans-serif;}
+.status-pill:hover{border-color:var(--border2);color:var(--text2);}
+.status-pill.active-pendiente{background:var(--amber-soft);border-color:var(--amber);color:var(--amber);}
+.status-pill.active-en-proceso{background:var(--blue-soft);border-color:var(--blue);color:var(--blue);}
+.status-pill.active-completado{background:var(--green-soft);border-color:var(--green);color:var(--green);}
+.card-admin-btns{position:absolute;top:.45rem;right:.45rem;display:none;gap:.18rem;align-items:center;}
+.is-admin .card-admin-btns{display:flex;}
+.btn-card-action{width:21px;height:21px;background:transparent;border:none;color:var(--text3);font-size:.68rem;cursor:pointer;display:flex;align-items:center;justify-content:center;border-radius:50%;transition:all .12s;}
+.btn-card-action.edit:hover{color:var(--accent);background:var(--accent-soft);}
+.btn-card-action.del:hover{color:var(--red);background:var(--red-soft);}
+
+/* ══ EMPTY / LOADING ══ */
+.week-empty{text-align:center;padding:5rem 2rem;color:var(--text3);}
+.week-empty-icon{font-size:2.8rem;margin-bottom:1rem;opacity:.35;}
+.week-empty-text{font-family:'Syne',sans-serif;font-size:.78rem;font-weight:600;text-transform:uppercase;letter-spacing:.08em;}
+
+/* ══ MODALS ══ */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.68);z-index:500;display:none;align-items:center;justify-content:center;padding:1rem;}
+.overlay.open{display:flex;}
+.modal{background:var(--surface);border:1px solid var(--border2);padding:1.4rem;width:100%;max-width:460px;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.6);animation:slideIn .18s ease both;}
+.modal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;}
+.modal-title{font-family:'Syne',sans-serif;font-size:.73rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--accent);}
+.modal-title.red{color:var(--red);}
+.btn-close{width:24px;height:24px;background:transparent;border:none;color:var(--text3);font-size:.88rem;cursor:pointer;display:flex;align-items:center;justify-content:center;border-radius:50%;transition:all .12s;}
+.btn-close:hover{color:var(--red);background:var(--red-soft);}
+.m-row{display:grid;grid-template-columns:1fr 1fr;gap:.55rem;margin-bottom:.55rem;}
+.m-row.full{grid-template-columns:1fr;}
+.m-field label{display:block;font-size:.61rem;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);margin-bottom:.26rem;}
+.m-field input,.m-field select,.m-field textarea{width:100%;background:var(--surface2);border:1px solid var(--border);color:var(--text);padding:.5rem .72rem;font-family:'Instrument Sans',sans-serif;font-size:.85rem;outline:none;border-radius:1px;transition:border-color .12s;}
+.m-field textarea{resize:vertical;min-height:70px;line-height:1.45;}
+.m-field input:focus,.m-field select:focus,.m-field textarea:focus{border-color:var(--accent);}
+.m-field input::placeholder,.m-field textarea::placeholder{color:var(--text3);}
+.modal-actions{display:flex;gap:.5rem;margin-top:.9rem;}
+.btn-modal-primary{flex:1;padding:.6rem;background:var(--accent);border:none;color:#fff;font-family:'Syne',sans-serif;font-size:.76rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;cursor:pointer;border-radius:1px;transition:opacity .12s;}
+.btn-modal-primary:hover{opacity:.85;}
+.btn-modal-danger{flex:1;padding:.6rem;background:var(--red);border:none;color:#fff;font-family:'Syne',sans-serif;font-size:.76rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;cursor:pointer;border-radius:1px;transition:opacity .12s;}
+.btn-modal-danger:hover{opacity:.85;}
+.btn-modal-secondary{padding:.6rem 1rem;background:transparent;border:1px solid var(--border2);color:var(--text2);font-family:'Instrument Sans',sans-serif;font-size:.76rem;cursor:pointer;border-radius:1px;transition:all .12s;}
+.btn-modal-secondary:hover{border-color:var(--text2);color:var(--text);}
+.confirm-modal-body{font-size:.82rem;color:var(--text2);line-height:1.55;margin-bottom:.2rem;}
+.confirm-modal-name{color:var(--red);font-weight:600;}
+.settings-section{margin-bottom:1.1rem;padding-bottom:1.1rem;border-bottom:1px solid var(--border);}
+.settings-section:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0;}
+.settings-section-title{font-family:'Syne',sans-serif;font-size:.66rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--text3);margin-bottom:.65rem;}
+.settings-user-label{font-size:.77rem;color:var(--text2);margin-bottom:.75rem;}
+.settings-user-label strong{color:var(--text);}
+.toast{position:fixed;bottom:1.2rem;right:1.2rem;background:var(--surface3);border:1px solid var(--border2);color:var(--text);padding:.6rem 1rem;font-size:.75rem;border-radius:2px;opacity:0;transform:translateY(6px);transition:all .22s;pointer-events:none;z-index:999;box-shadow:0 8px 24px rgba(0,0,0,.4);}
+.toast.show{opacity:1;transform:translateY(0);}
+@keyframes slideIn{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
+@media(max-width:600px){
+  .form-grid-3x2{grid-template-columns:1fr 1fr;}
+  .topbar{height:auto;padding:.5rem .8rem;}
+  .week-bar{padding:.55rem .8rem;}
+  .calendar-wrap{padding:.65rem .8rem;}
+  .admin-panel{padding:.85rem .8rem;}
+  .login-card{padding:1.8rem 1.5rem;}
+  .day-events{padding:4.5rem .5rem .6rem;}
+}
+</style>
+</head>
+<body>
+
+<!-- ══ LOGIN ══ -->
+<div id="login-screen">
+  <div class="login-bg"></div>
+  <div class="login-card">
+    <div class="login-logo"><em>ARCHER</em></div>
+    <div class="login-tagline">
+      <strong>A</strong>sistente de <strong>R</strong>egistro, <strong>C</strong>ontrol y <strong>H</strong>erramientas<br>
+      de <strong>E</strong>valuación de <strong>R</strong>endimiento
+    </div>
+
+    <!-- Loading state while Firebase connects -->
+    <div class="connecting-state" id="connecting-state">
+      <div class="connecting-spinner"></div>
+      <div class="connecting-text">Conectando con el servidor…</div>
+    </div>
+
+    <!-- Profile selector (user already registered) -->
+    <div class="profile-section" id="profile-section">
+      <div class="profile-label">Bienvenido de nuevo</div>
+      <div id="profile-btn-wrap"></div>
+      <div class="divider">o</div>
+      <button class="btn-ghost" onclick="toggleAdminForm('profile')">⚙ Acceso administrador</button>
+      <div class="admin-form" id="admin-form-profile">
+        <div class="field" style="margin-top:.75rem">
+          <label>Contraseña de administrador</label>
+          <input type="password" id="admin-pass-profile" placeholder="••••••••" onkeydown="if(event.key==='Enter')loginAdmin('profile')">
+          <div class="error" id="pass-error-profile">Contraseña incorrecta.</div>
+        </div>
+        <button class="btn-main" style="background:var(--red)" onclick="loginAdmin('profile')">Entrar como admin →</button>
+      </div>
+    </div>
+
+    <!-- New user registration form (only shown when no profile exists) -->
+    <div class="new-user-section" id="new-user-section">
+      <div class="field">
+        <label>Nombre o alias</label>
+        <input type="text" id="username-input" placeholder="ej. María García" onkeydown="if(event.key==='Enter')document.getElementById('user-pass-input').focus()">
+        <div class="error" id="name-error">Escribe tu nombre para continuar.</div>
+      </div>
+      <div class="field">
+        <label>Crea tu contraseña</label>
+        <input type="password" id="user-pass-input" placeholder="Tu contraseña personal" onkeydown="if(event.key==='Enter')registerUser()">
+        <div class="error" id="user-pass-error"></div>
+      </div>
+      <button class="btn-main" onclick="registerUser()">Crear perfil y entrar →</button>
+      <div class="divider">o</div>
+      <button class="btn-ghost" onclick="toggleAdminForm('new')">⚙ Acceso administrador</button>
+      <div class="admin-form" id="admin-form-new">
+        <div class="field" style="margin-top:.75rem">
+          <label>Contraseña de administrador</label>
+          <input type="password" id="admin-pass-new" placeholder="••••••••" onkeydown="if(event.key==='Enter')loginAdmin('new')">
+          <div class="error" id="pass-error-new">Contraseña incorrecta.</div>
+        </div>
+        <button class="btn-main" style="background:var(--red)" onclick="loginAdmin('new')">Entrar como admin →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ APP ══ -->
+<div id="app">
+  <div class="topbar">
+    <div class="topbar-left">
+      <div class="topbar-logo"><em>ARCHER</em></div>
+      <div class="sync-wrap"><div class="sync-dot" id="sync-dot"></div><span class="sync-label" id="sync-label">conectado</span></div>
+    </div>
+    <div class="topbar-spacer"></div>
+    <div class="topbar-right">
+      <div class="user-chip"><div class="role-dot" id="role-dot"></div><span id="topbar-name"></span></div>
+      <button class="btn-sm" onclick="openSettings()">⚙</button>
+      <button class="btn-sm" onclick="logout()">Salir</button>
+    </div>
+  </div>
+
+  <div class="week-bar">
+    <div class="week-select-wrap">
+      <label>Semana</label>
+      <select id="week-select" onchange="selectWeek(this.value)"></select>
+    </div>
+    <div class="week-nav-btns">
+      <button class="btn-nav" onclick="navWeek(-1)">←</button>
+      <button class="btn-nav" onclick="navWeek(1)">→</button>
+    </div>
+    <div class="admin-week-controls" id="admin-week-controls">
+      <input class="inline-input" id="new-week-name" placeholder="Nombre de semana" maxlength="40">
+      <button class="btn-accent-sm" onclick="addWeek()">+ Agregar</button>
+      <button class="btn-accent-sm" style="background:var(--surface2);border:1px solid var(--border2);color:var(--text2);" onclick="openRenameWeek()">Renombrar</button>
+      <button class="btn-accent-sm" style="background:var(--red);opacity:.9" onclick="askDeleteWeek()">Eliminar</button>
+    </div>
+  </div>
+
+  <div class="admin-panel" id="admin-panel">
+    <div class="admin-panel-header">
+      <span>● Panel de administrador</span>
+      <div class="admin-tabs">
+        <button class="admin-tab active" onclick="switchAdminTab('events',this)">Eventos</button>
+        <button class="admin-tab" onclick="switchAdminTab('subjects',this)">Materias</button>
+      </div>
+    </div>
+    <div class="admin-tab-panel active" id="tab-events">
+      <div class="form-row-full">
+        <div class="form-field"><label>Título del evento *</label><input type="text" id="ev-title" placeholder="ej. Parcial 1 — Cálculo"></div>
+      </div>
+      <div class="form-grid-3x2">
+        <div class="form-field"><label>Tipo *</label>
+          <select id="ev-type">
+            <option value="clase">Clase regular</option><option value="laboratorio">Laboratorio</option>
+            <option value="parcial">Parcial / Examen</option><option value="trabajo">Trabajo / Tarea</option>
+            <option value="especial">Evento especial</option>
+          </select>
+        </div>
+        <div class="form-field"><label>Materia</label><select id="ev-subject"></select></div>
+        <div class="form-field"><label>Día *</label>
+          <select id="ev-day"><option>Lunes</option><option>Martes</option><option>Miércoles</option><option>Jueves</option><option>Viernes</option><option>Sábado</option><option>Domingo</option></select>
+        </div>
+        <div class="form-field"><label>Fecha límite</label><input type="date" id="ev-date"></div>
+        <div class="form-field"><label>Hora inicio</label><input type="time" id="ev-time-start"></div>
+        <div class="form-field"><label>Hora fin</label><input type="time" id="ev-time-end"></div>
+      </div>
+      <div class="form-grid-bottom">
+        <div class="form-field"><label>Descripción (opcional)</label><textarea id="ev-desc" placeholder="Notas, instrucciones, temas a estudiar…"></textarea></div>
+        <div class="form-field"><button class="btn-add-event" onclick="addEvent()">+ Agregar evento</button></div>
+      </div>
+    </div>
+    <div class="admin-tab-panel" id="tab-subjects">
+      <div class="form-grid-subjects" style="max-width:420px">
+        <div class="form-field"><label>Nueva materia</label><input type="text" id="new-subject-input" placeholder="ej. Cálculo II" maxlength="60" onkeydown="if(event.key==='Enter')addSubject()"></div>
+        <div class="form-field"><button class="btn-add-event" onclick="addSubject()">+ Añadir</button></div>
+      </div>
+      <div class="subjects-list" id="subjects-list"></div>
+    </div>
+  </div>
+
+  <div class="calendar-wrap" id="calendar-wrap">
+    <div class="week-empty"><div class="connecting-spinner" style="margin:0 auto 1rem"></div><div class="week-empty-text">Cargando horario…</div></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- EDIT EVENT MODAL -->
+<div class="overlay" id="edit-overlay" onclick="handleOverlayClick(event,'edit-overlay')">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">✎ Editar evento</div>
+      <button class="btn-close" onclick="closeOverlay('edit-overlay')">✕</button>
+    </div>
+    <div class="m-row full"><div class="m-field"><label>Título</label><input type="text" id="em-title"></div></div>
+    <div class="m-row">
+      <div class="m-field"><label>Tipo</label>
+        <select id="em-type"><option value="clase">Clase regular</option><option value="laboratorio">Laboratorio</option><option value="parcial">Parcial / Examen</option><option value="trabajo">Trabajo / Tarea</option><option value="especial">Evento especial</option></select>
+      </div>
+      <div class="m-field"><label>Materia</label><select id="em-subject"></select></div>
+    </div>
+    <div class="m-row">
+      <div class="m-field"><label>Día</label>
+        <select id="em-day"><option>Lunes</option><option>Martes</option><option>Miércoles</option><option>Jueves</option><option>Viernes</option><option>Sábado</option><option>Domingo</option></select>
+      </div>
+      <div class="m-field"><label>Fecha límite</label><input type="date" id="em-date"></div>
+    </div>
+    <div class="m-row">
+      <div class="m-field"><label>Hora inicio</label><input type="time" id="em-tstart"></div>
+      <div class="m-field"><label>Hora fin</label><input type="time" id="em-tend"></div>
+    </div>
+    <div class="m-row full"><div class="m-field"><label>Descripción</label><textarea id="em-desc" placeholder="Notas, instrucciones, detalles…"></textarea></div></div>
+    <div class="modal-actions">
+      <button class="btn-modal-primary" onclick="saveEditModal()">Guardar cambios</button>
+      <button class="btn-modal-secondary" onclick="closeOverlay('edit-overlay')">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+<!-- CONFIRM MODAL -->
+<div class="overlay" id="confirm-overlay" onclick="handleOverlayClick(event,'confirm-overlay')">
+  <div class="modal" style="max-width:360px">
+    <div class="modal-header">
+      <div class="modal-title red" id="confirm-title">⚠ Confirmar</div>
+      <button class="btn-close" onclick="closeOverlay('confirm-overlay')">✕</button>
+    </div>
+    <p class="confirm-modal-body" id="confirm-body"></p>
+    <div class="modal-actions">
+      <button class="btn-modal-danger" id="confirm-ok-btn">Sí, eliminar</button>
+      <button class="btn-modal-secondary" onclick="closeOverlay('confirm-overlay')">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+<!-- RENAME WEEK MODAL -->
+<div class="overlay" id="rename-overlay" onclick="handleOverlayClick(event,'rename-overlay')">
+  <div class="modal" style="max-width:360px">
+    <div class="modal-header">
+      <div class="modal-title">Renombrar semana</div>
+      <button class="btn-close" onclick="closeOverlay('rename-overlay')">✕</button>
+    </div>
+    <div class="m-row full"><div class="m-field"><label>Nuevo nombre</label><input type="text" id="rename-week-input" maxlength="40" onkeydown="if(event.key==='Enter')saveRenameWeek()"></div></div>
+    <div class="modal-actions">
+      <button class="btn-modal-primary" onclick="saveRenameWeek()">Guardar</button>
+      <button class="btn-modal-secondary" onclick="closeOverlay('rename-overlay')">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+<!-- SETTINGS MODAL -->
+<div class="overlay" id="settings-overlay" onclick="handleOverlayClick(event,'settings-overlay')">
+  <div class="modal" style="max-width:380px">
+    <div class="modal-header">
+      <div class="modal-title">⚙ Ajustes</div>
+      <button class="btn-close" onclick="closeOverlay('settings-overlay')">✕</button>
+    </div>
+    <div class="settings-section">
+      <div class="settings-section-title">Cuenta</div>
+      <p class="settings-user-label">Usuario: <strong id="settings-username"></strong></p>
+      <div class="m-field" style="margin-bottom:.55rem"><label>Contraseña actual</label><input type="password" id="s-pass-current" placeholder="Tu contraseña actual"></div>
+      <div class="m-field" style="margin-bottom:.55rem"><label>Nueva contraseña</label><input type="password" id="s-pass-new" placeholder="Nueva contraseña"></div>
+      <div class="m-field" style="margin-bottom:.7rem"><label>Confirmar nueva contraseña</label><input type="password" id="s-pass-confirm" placeholder="Repite la nueva contraseña"></div>
+      <div class="error" id="s-pass-error" style="margin-bottom:.5rem"></div>
+      <button class="btn-modal-primary" style="width:100%;padding:.52rem" onclick="changeUserPassword()">Cambiar contraseña</button>
+    </div>
+    <div class="settings-section">
+      <div class="settings-section-title">Zona de peligro</div>
+      <p style="font-size:.75rem;color:var(--text3);margin-bottom:.7rem;line-height:1.5">Eliminar tu perfil borrará tu progreso guardado. El horario compartido no se verá afectado.</p>
+      <button class="btn-modal-danger" style="width:100%;padding:.52rem" onclick="openDeleteProfile()">Eliminar mi perfil</button>
+    </div>
+  </div>
+</div>
+
+<!-- DELETE PROFILE MODAL -->
+<div class="overlay" id="delete-overlay" onclick="handleOverlayClick(event,'delete-overlay')">
+  <div class="modal" style="max-width:360px">
+    <div class="modal-header">
+      <div class="modal-title red">⚠ Eliminar perfil</div>
+      <button class="btn-close" onclick="closeOverlay('delete-overlay')">✕</button>
+    </div>
+    <p style="font-size:.8rem;color:var(--text2);margin-bottom:.9rem;line-height:1.5">Esta acción no se puede deshacer. Confirma con tu contraseña para continuar.</p>
+    <div class="m-field" style="margin-bottom:.7rem"><label>Tu contraseña</label><input type="password" id="del-pass" onkeydown="if(event.key==='Enter')confirmDeleteProfile()"></div>
+    <div class="error" id="del-pass-error" style="margin-bottom:.5rem">Contraseña incorrecta.</div>
+    <div class="modal-actions">
+      <button class="btn-modal-danger" onclick="confirmDeleteProfile()">Sí, eliminar</button>
+      <button class="btn-modal-secondary" onclick="closeOverlay('delete-overlay')">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ FIREBASE + APP SCRIPT ══ -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getDatabase, ref, onValue, set, update, remove, get }
+  from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
+// ── Firebase config ──
+const firebaseConfig = {
+  apiKey: "AIzaSyBYLt4u-rTMXHxWdug57wbUNo7opPQUuY4",
+  authDomain: "archer-mws.firebaseapp.com",
+  databaseURL: "https://archer-mws-default-rtdb.firebaseio.com",
+  projectId: "archer-mws",
+  storageBucket: "archer-mws.firebasestorage.app",
+  messagingSenderId: "535787902121",
+  appId: "1:535787902121:web:9f5638a27250a2446f45b8"
+};
+
+const fbApp = initializeApp(firebaseConfig);
+const db    = getDatabase(fbApp);
+
+// ── Constants ──
+const ADMIN_PASSWORD = "admin2024";
+const DAYS = ["Lunes","Martes","Miércoles","Jueves","Viernes","Sábado","Domingo"];
+const TYPE_LABELS = {clase:"Clase",laboratorio:"Lab",parcial:"Parcial",trabajo:"Trabajo",especial:"Especial"};
+const LOCAL_USERS_KEY   = "archer_users_v1";
+const LOCAL_SESSION_KEY = "archer_session_v1";
+
+// ── State ──
+let currentUser = null, isAdmin = false, currentWeekIdx = 0;
+let scheduleData = {weeks:[]};
+let subjects = [];
+let userStatuses = {};
+let editingEvId = null, editingWeekIdx = null;
+let pendingDeleteFn = null;
+let scheduleUnsubscribe = null;
+
+// ── Local helpers (users + session stay local for privacy) ──
+function loadUsers(){try{return JSON.parse(localStorage.getItem(LOCAL_USERS_KEY))||{};}catch(e){return{};}}
+function saveUsers(u){try{localStorage.setItem(LOCAL_USERS_KEY,JSON.stringify(u));}catch(e){}}
+function hashPass(s){let h=5381;for(let i=0;i<s.length;i++)h=((h<<5)+h)+s.charCodeAt(i);return(h>>>0).toString(36);}
+function saveSession(name){try{localStorage.setItem(LOCAL_SESSION_KEY,name);}catch(e){}}
+function clearSession(){try{localStorage.removeItem(LOCAL_SESSION_KEY);}catch(e){}}
+function getSavedSession(){try{return localStorage.getItem(LOCAL_SESSION_KEY)||null;}catch(e){return null;}}
+function getStatusKey(){return`archer_status_${hashPass(currentUser)}_v1`;}
+function saveStatuses(){try{localStorage.setItem(getStatusKey(),JSON.stringify(userStatuses));}catch(e){}}
+function loadStatuses(){try{const s=localStorage.getItem(getStatusKey());userStatuses=s?JSON.parse(s):{};}catch(e){userStatuses={};}}
+
+// ── Firebase: schedule (shared, real-time) ──
+async function fbSaveSchedule(){
+  setSyncLabel("guardando…"); setDot('syncing');
+  try{
+    await set(ref(db,'schedule'),scheduleData);
+    setSyncLabel("guardado"); setDot('ok');
+  }catch(e){
+    setSyncLabel("error al guardar"); setDot('offline');
+    showToast("Error al guardar. Revisa tu conexión.");
+  }
+}
+
+async function fbSaveSubjects(){
+  try{ await set(ref(db,'subjects'),subjects); }catch(e){}
+}
+
+function fbListenSchedule(){
+  if(scheduleUnsubscribe) scheduleUnsubscribe();
+  const schedRef = ref(db,'schedule');
+  scheduleUnsubscribe = onValue(schedRef, snap=>{
+    const val = snap.val();
+    if(val && val.weeks){
+      scheduleData = val;
+    } else {
+      scheduleData = {weeks:[]};
+      for(let i=1;i<=16;i++) scheduleData.weeks.push({id:uid(),name:`Semana ${i}`,events:[]});
+      fbSaveSchedule();
+    }
+    if(currentWeekIdx >= scheduleData.weeks.length) currentWeekIdx = 0;
+    buildWeekSelect();
+    renderCalendar();
+    setSyncLabel("en vivo"); setDot('ok');
+  }, err=>{
+    setSyncLabel("sin conexión"); setDot('offline');
+  });
+}
+
+function fbListenSubjects(){
+  onValue(ref(db,'subjects'), snap=>{
+    subjects = snap.val() || [];
+    renderSubjectSelects();
+    renderSubjectsList();
+  });
+}
+
+// ── Login screen init ──
+function initLoginScreen(){
+  hideEl('connecting-state');
+  const users = loadUsers();
+  const savedNames = Object.keys(users);
+  if(savedNames.length > 0){
+    // Show profile selector — no option to create new
+    showProfileSelector(savedNames);
+  } else {
+    showNewUserForm();
+  }
+}
+
+function showProfileSelector(names){
+  document.getElementById('profile-section').style.display = 'block';
+  document.getElementById('new-user-section').style.display = 'none';
+  const wrap = document.getElementById('profile-btn-wrap');
+  wrap.innerHTML = names.map(name=>`
+    <div class="profile-btn" onclick="quickLogin('${esc(name)}')">
+      <div class="profile-avatar">${esc(name.charAt(0).toUpperCase())}</div>
+      <div>
+        <div class="profile-name">${esc(name)}</div>
+        <div class="profile-hint">Toca para ingresar directamente</div>
+      </div>
+    </div>`).join('');
+}
+
+function showNewUserForm(){
+  document.getElementById('profile-section').style.display = 'none';
+  document.getElementById('new-user-section').style.display = 'block';
+}
+
+// ── Auth ──
+window.quickLogin = function(name){
+  const users = loadUsers();
+  if(!users[name]){showToast('Perfil no encontrado');return;}
+  currentUser = name; isAdmin = false;
+  saveSession(name);
+  startApp();
+};
+
+window.registerUser = function(){
+  const name = document.getElementById('username-input').value.trim();
+  const pass  = document.getElementById('user-pass-input').value;
+  if(!name){showEl('name-error');return;} hideEl('name-error');
+  if(!pass){setErr('user-pass-error','Ingresa una contraseña.');showEl('user-pass-error');return;}
+  const users = loadUsers();
+  // Block creating a second profile
+  if(Object.keys(users).length > 0){
+    setErr('user-pass-error','Ya existe un perfil registrado en este dispositivo.');
+    showEl('user-pass-error'); return;
+  }
+  users[name] = {passHash: hashPass(pass)};
+  saveUsers(users);
+  hideEl('user-pass-error');
+  currentUser = name; isAdmin = false;
+  saveSession(name);
+  startApp();
+};
+
+window.toggleAdminForm = function(ctx){
+  const id = ctx==='profile' ? 'admin-form-profile' : 'admin-form-new';
+  const el = document.getElementById(id);
+  if(el) el.style.display = el.style.display==='block' ? 'none' : 'block';
+};
+
+window.loginAdmin = function(ctx){
+  const passId = ctx==='profile' ? 'admin-pass-profile' : 'admin-pass-new';
+  const errId  = ctx==='profile' ? 'pass-error-profile' : 'pass-error-new';
+  if(document.getElementById(passId).value !== ADMIN_PASSWORD){showEl(errId);return;}
+  hideEl(errId);
+  currentUser = "Administrador"; isAdmin = true;
+  startApp();
+};
+
+window.logout = function(){
+  clearSession();
+  currentUser = null; isAdmin = false; userStatuses = {};
+  if(scheduleUnsubscribe){ scheduleUnsubscribe(); scheduleUnsubscribe=null; }
+  document.getElementById('app').style.display = 'none';
+  document.getElementById('login-screen').style.display = 'flex';
+  ['username-input','user-pass-input','admin-pass-profile','admin-pass-new'].forEach(id=>{
+    const el=document.getElementById(id); if(el) el.value='';
+  });
+  ['admin-form-profile','admin-form-new'].forEach(id=>{
+    const el=document.getElementById(id); if(el) el.style.display='none';
+  });
+  initLoginScreen();
+};
+
+// ── App init ──
+function startApp(){
+  loadStatuses();
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('app').style.display = 'block';
+  if(isAdmin) document.getElementById('app').classList.add('is-admin');
+  else document.getElementById('app').classList.remove('is-admin');
+  document.getElementById('topbar-name').textContent = currentUser;
+  document.getElementById('role-dot').className = 'role-dot'+(isAdmin?' admin':'');
+  if(isAdmin){
+    document.getElementById('admin-panel').style.display = 'block';
+    document.getElementById('admin-week-controls').style.display = 'flex';
+  } else {
+    document.getElementById('admin-panel').style.display = 'none';
+    document.getElementById('admin-week-controls').style.display = 'none';
+  }
+  currentWeekIdx = 0;
+  fbListenSchedule();
+  fbListenSubjects();
+}
+
+// ── Confirm modal ──
+window.openConfirm = function(title,body,onConfirm){
+  document.getElementById('confirm-title').textContent = title;
+  document.getElementById('confirm-body').innerHTML = body;
+  pendingDeleteFn = onConfirm;
+  document.getElementById('confirm-ok-btn').onclick = ()=>{
+    closeOverlay('confirm-overlay');
+    if(pendingDeleteFn) pendingDeleteFn();
+    pendingDeleteFn = null;
+  };
+  openOverlay('confirm-overlay');
+};
+
+// ── Admin tabs ──
+window.switchAdminTab = function(name,btn){
+  document.querySelectorAll('.admin-tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.admin-tab-panel').forEach(p=>p.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('tab-'+name).classList.add('active');
+};
+
+// ── Subjects ──
+function renderSubjectSelects(){
+  const opts = '<option value="">— Sin materia —</option>'+subjects.map(s=>`<option value="${esc(s)}">${esc(s)}</option>`).join('');
+  ['ev-subject','em-subject'].forEach(id=>{const el=document.getElementById(id);if(el)el.innerHTML=opts;});
+}
+function renderSubjectsList(){
+  const list = document.getElementById('subjects-list'); if(!list) return;
+  if(!subjects.length){list.innerHTML='<div class="subjects-empty">No hay materias. Agrega una arriba.</div>';return;}
+  list.innerHTML = subjects.map((s,i)=>`<div class="subject-chip"><span>${esc(s)}</span><button onclick="removeSubject(${i})" title="Eliminar">✕</button></div>`).join('');
+}
+window.addSubject = function(){
+  if(!isAdmin) return;
+  const inp = document.getElementById('new-subject-input');
+  const val = inp.value.trim();
+  if(!val||subjects.includes(val)){showToast(val?'Esa materia ya existe':'Escribe un nombre');return;}
+  subjects.push(val); fbSaveSubjects(); inp.value='';
+  renderSubjectSelects(); renderSubjectsList(); showToast(`"${val}" agregada`);
+};
+window.removeSubject = function(idx){
+  if(!isAdmin) return;
+  const name = subjects[idx];
+  subjects.splice(idx,1); fbSaveSubjects();
+  renderSubjectSelects(); renderSubjectsList(); showToast(`"${name}" eliminada`);
+};
+
+// ── Weeks ──
+function buildWeekSelect(){
+  const sel = document.getElementById('week-select'); sel.innerHTML='';
+  scheduleData.weeks.forEach((w,i)=>{
+    const o = document.createElement('option');
+    o.value=i; o.textContent=w.name;
+    if(i===currentWeekIdx) o.selected=true;
+    sel.appendChild(o);
+  });
+}
+window.selectWeek = function(idx){currentWeekIdx=parseInt(idx);renderCalendar();};
+window.navWeek = function(dir){
+  const n=currentWeekIdx+dir;
+  if(n<0||n>=scheduleData.weeks.length)return;
+  currentWeekIdx=n; document.getElementById('week-select').value=n; renderCalendar();
+};
+window.addWeek = function(){
+  if(!isAdmin)return;
+  const inp=document.getElementById('new-week-name');
+  const name=inp.value.trim()||`Semana ${scheduleData.weeks.length+1}`;
+  scheduleData.weeks.push({id:uid(),name,events:[]}); fbSaveSchedule();
+  currentWeekIdx=scheduleData.weeks.length-1; buildWeekSelect();
+  document.getElementById('week-select').value=currentWeekIdx; renderCalendar();
+  inp.value=''; showToast(`"${name}" agregada`);
+};
+window.askDeleteWeek = function(){
+  if(!isAdmin)return;
+  if(scheduleData.weeks.length<=1){showToast('Debe quedar al menos una semana');return;}
+  const name=scheduleData.weeks[currentWeekIdx].name;
+  openConfirm('⚠ Eliminar semana',
+    `¿Deseas eliminar <span class="confirm-modal-name">"${esc(name)}"</span>? Se perderán todos sus eventos.`,
+    doDeleteWeek);
+};
+function doDeleteWeek(){
+  const name=scheduleData.weeks[currentWeekIdx].name;
+  scheduleData.weeks.splice(currentWeekIdx,1);
+  if(currentWeekIdx>=scheduleData.weeks.length) currentWeekIdx=Math.max(0,scheduleData.weeks.length-1);
+  fbSaveSchedule(); buildWeekSelect();
+  document.getElementById('week-select').value=currentWeekIdx; renderCalendar();
+  showToast(`"${name}" eliminada`);
+}
+window.openRenameWeek = function(){
+  if(!isAdmin)return;
+  document.getElementById('rename-week-input').value=scheduleData.weeks[currentWeekIdx].name;
+  openOverlay('rename-overlay');
+};
+window.saveRenameWeek = function(){
+  const val=document.getElementById('rename-week-input').value.trim();
+  if(!val){showToast('Escribe un nombre');return;}
+  scheduleData.weeks[currentWeekIdx].name=val; fbSaveSchedule(); buildWeekSelect();
+  document.getElementById('week-select').value=currentWeekIdx; closeOverlay('rename-overlay'); showToast('Semana renombrada');
+};
+
+// ── Events ──
+window.addEvent = function(){
+  if(!isAdmin)return;
+  const title=document.getElementById('ev-title').value.trim();
+  if(!title){showToast('Escribe un título');return;}
+  const ev={
+    id:uid(),title,
+    type:document.getElementById('ev-type').value,
+    subject:document.getElementById('ev-subject').value,
+    day:document.getElementById('ev-day').value,
+    date:document.getElementById('ev-date').value,
+    timeStart:document.getElementById('ev-time-start').value,
+    timeEnd:document.getElementById('ev-time-end').value,
+    desc:document.getElementById('ev-desc').value.trim(),
+  };
+  if(!scheduleData.weeks[currentWeekIdx].events) scheduleData.weeks[currentWeekIdx].events=[];
+  scheduleData.weeks[currentWeekIdx].events.push(ev); fbSaveSchedule();
+  ['ev-title','ev-date','ev-time-start','ev-time-end','ev-desc'].forEach(id=>document.getElementById(id).value='');
+  showToast(`"${title}" agregado`);
+};
+window.askDeleteEvent = function(weekIdx,evId){
+  if(!isAdmin)return;
+  const ev=scheduleData.weeks[weekIdx]?.events?.find(e=>e.id===evId);
+  const name=ev?ev.title:'este evento';
+  openConfirm('⚠ Eliminar evento',
+    `¿Deseas eliminar <span class="confirm-modal-name">"${esc(name)}"</span>? Esta acción no se puede deshacer.`,
+    ()=>doDeleteEvent(weekIdx,evId));
+};
+function doDeleteEvent(weekIdx,evId){
+  scheduleData.weeks[weekIdx].events=scheduleData.weeks[weekIdx].events.filter(e=>e.id!==evId);
+  fbSaveSchedule(); showToast('Evento eliminado');
+}
+
+// ── Edit modal ──
+window.openEditModal = function(evId,weekIdx){
+  if(!isAdmin)return;
+  const ev=scheduleData.weeks[weekIdx]?.events?.find(e=>e.id===evId); if(!ev)return;
+  editingEvId=evId; editingWeekIdx=weekIdx;
+  renderSubjectSelects();
+  document.getElementById('em-title').value=ev.title||'';
+  document.getElementById('em-type').value=ev.type||'clase';
+  document.getElementById('em-subject').value=ev.subject||'';
+  document.getElementById('em-day').value=ev.day||'Lunes';
+  document.getElementById('em-date').value=ev.date||'';
+  document.getElementById('em-tstart').value=ev.timeStart||'';
+  document.getElementById('em-tend').value=ev.timeEnd||'';
+  document.getElementById('em-desc').value=ev.desc||'';
+  openOverlay('edit-overlay');
+};
+window.saveEditModal = function(){
+  if(!isAdmin||!editingEvId)return;
+  const title=document.getElementById('em-title').value.trim();
+  if(!title){showToast('El título no puede estar vacío');return;}
+  const ev=scheduleData.weeks[editingWeekIdx].events.find(e=>e.id===editingEvId); if(!ev)return;
+  ev.title=title; ev.type=document.getElementById('em-type').value;
+  ev.subject=document.getElementById('em-subject').value;
+  ev.day=document.getElementById('em-day').value; ev.date=document.getElementById('em-date').value;
+  ev.timeStart=document.getElementById('em-tstart').value; ev.timeEnd=document.getElementById('em-tend').value;
+  ev.desc=document.getElementById('em-desc').value.trim();
+  fbSaveSchedule(); closeOverlay('edit-overlay'); showToast('Evento actualizado');
+};
+
+// ── Status ──
+window.setStatus = function(evId,status){
+  userStatuses[evId]=userStatuses[evId]===status?null:status;
+  if(!userStatuses[evId]) delete userStatuses[evId];
+  saveStatuses();
+  const card=document.querySelector(`[data-ev-id="${evId}"]`); if(!card)return;
+  card.querySelectorAll('.status-pill').forEach(btn=>{btn.className='status-pill'+(userStatuses[evId]===btn.dataset.status?` active-${btn.dataset.status}`:'');});
+  updateDayStats(card);
+};
+function updateDayStats(card){
+  const dayCol=card.closest('.day-col'); if(!dayCol)return;
+  const allCards=dayCol.querySelectorAll('.event-card');
+  let pending=0;
+  allCards.forEach(c=>{if(userStatuses[c.dataset.evId]!=='completado')pending++;});
+  const statsEl=dayCol.querySelector('.day-stats');
+  if(statsEl) statsEl.innerHTML=buildDayStats(allCards.length,pending);
+}
+function buildDayStats(total,pending){
+  if(!total)return'';
+  if(pending===0)return`<span class="day-done">✓ Todo realizado</span>`;
+  return`${total} evento${total>1?'s':''} · <span class="day-pending">${pending} pendiente${pending>1?'s':''}</span>`;
+}
+
+// ── Toggle detail / desc ──
+window.toggleDetail = function(evId){
+  const card=document.querySelector(`[data-ev-id="${evId}"]`); if(!card)return;
+  card.querySelector('.event-detail')?.classList.toggle('open');
+  card.querySelector('.toggle-arrow')?.classList.toggle('open');
+};
+window.toggleDesc = function(evId){
+  const card=document.querySelector(`[data-ev-id="${evId}"]`); if(!card)return;
+  card.querySelector('.desc-body')?.classList.toggle('open');
+  card.querySelector('.desc-toggle-arrow')?.classList.toggle('open');
+};
+
+// ── Settings ──
+window.openSettings = function(){
+  document.getElementById('settings-username').textContent=currentUser;
+  ['s-pass-current','s-pass-new','s-pass-confirm'].forEach(id=>document.getElementById(id).value='');
+  hideEl('s-pass-error'); openOverlay('settings-overlay');
+};
+window.changeUserPassword = function(){
+  if(isAdmin){showToast('El admin usa contraseña fija en el código');return;}
+  const cur=document.getElementById('s-pass-current').value;
+  const nw=document.getElementById('s-pass-new').value;
+  const cf=document.getElementById('s-pass-confirm').value;
+  const users=loadUsers();
+  if(!users[currentUser]||users[currentUser].passHash!==hashPass(cur)){setErr('s-pass-error','Contraseña actual incorrecta.');showEl('s-pass-error');return;}
+  if(nw.length<4){setErr('s-pass-error','Mínimo 4 caracteres.');showEl('s-pass-error');return;}
+  if(nw!==cf){setErr('s-pass-error','Las contraseñas no coinciden.');showEl('s-pass-error');return;}
+  users[currentUser].passHash=hashPass(nw); saveUsers(users);
+  hideEl('s-pass-error'); closeOverlay('settings-overlay'); showToast('Contraseña actualizada');
+};
+window.openDeleteProfile = function(){document.getElementById('del-pass').value='';hideEl('del-pass-error');openOverlay('delete-overlay');};
+window.confirmDeleteProfile = function(){
+  if(isAdmin){showToast('No puedes eliminar la cuenta de admin aquí');return;}
+  const pass=document.getElementById('del-pass').value;
+  const users=loadUsers();
+  if(!users[currentUser]||users[currentUser].passHash!==hashPass(pass)){showEl('del-pass-error');return;}
+  delete users[currentUser]; saveUsers(users);
+  try{localStorage.removeItem(getStatusKey());}catch(e){}
+  clearSession();
+  closeOverlay('delete-overlay'); closeOverlay('settings-overlay');
+  showToast('Perfil eliminado'); window.logout();
+};
+
+// ── Render ──
+function buildDetailHTML(dateStr,timeStr,desc){
+  let html='';
+  if(dateStr) html+=`<div class="detail-row">📅 ${dateStr}</div>`;
+  if(timeStr) html+=`<div class="detail-row">🕐 ${timeStr}</div>`;
+  if(desc){
+    if(dateStr||timeStr) html+=`<div class="detail-divider"></div>`;
+    html+=`<div class="desc-toggle" onclick="toggleDesc(this.closest('.event-card').dataset.evId)">
+      <span class="desc-toggle-label">Descripción</span>
+      <span class="desc-toggle-arrow">▼</span>
+    </div><div class="desc-body"><div class="detail-desc">${esc(desc)}</div></div>`;
+  }
+  return html;
+}
+
+function renderCalendar(){
+  const wrap=document.getElementById('calendar-wrap');
+  const week=scheduleData.weeks[currentWeekIdx];
+  if(!week){wrap.innerHTML=`<div class="week-empty"><div class="week-empty-icon">📋</div><div class="week-empty-text">No hay semanas</div></div>`;return;}
+  const evsByDay={};
+  DAYS.forEach(d=>evsByDay[d]=[]);
+  (week.events||[]).forEach(ev=>{if(evsByDay[ev.day])evsByDay[ev.day].push(ev);});
+  let html=`<div class="calendar-grid">`;
+  DAYS.forEach(day=>{
+    const evs=evsByDay[day], total=evs.length;
+    let pending=0;
+    evs.forEach(ev=>{if(userStatuses[ev.id]!=='completado')pending++;});
+    html+=`<div class="day-col">
+      <div class="day-header">
+        <div class="day-name">${day}</div>
+        <div class="day-stats">${buildDayStats(total,pending)}</div>
+      </div>
+      <div class="day-events">`;
+    if(!total){
+      html+=`<div class="day-empty">—</div>`;
+    } else {
+      evs.forEach(ev=>{
+        const status=userStatuses[ev.id]||'';
+        const timeStr=ev.timeStart?(ev.timeEnd?`${fmtTime(ev.timeStart)} – ${fmtTime(ev.timeEnd)}`:fmtTime(ev.timeStart)):'';
+        const dateStr=ev.date?fmtDate(ev.date):'';
+        const hasDetail=!!(dateStr||timeStr||ev.desc);
+        html+=`
+        <div class="event-card" data-type="${ev.type}" data-ev-id="${ev.id}">
+          <div class="card-admin-btns">
+            <button class="btn-card-action edit" onclick="openEditModal('${ev.id}',${currentWeekIdx})">✎</button>
+            <button class="btn-card-action del" onclick="askDeleteEvent(${currentWeekIdx},'${ev.id}')">✕</button>
+          </div>
+          <div class="card-top">
+            <span class="event-type-pill pill-${ev.type}">${TYPE_LABELS[ev.type]}</span>
+            ${hasDetail?`<span class="toggle-arrow" onclick="toggleDetail('${ev.id}')">▼</span>`:''}
+          </div>
+          <div class="event-title-text">${esc(ev.title)}</div>
+          ${ev.subject?`<div class="event-subject">${esc(ev.subject)}</div>`:''}
+          ${hasDetail?`<div class="event-detail">${buildDetailHTML(dateStr,timeStr,ev.desc)}</div>`:''}
+          <div class="status-row">
+            <button class="status-pill${status==='pendiente'?' active-pendiente':''}" data-status="pendiente" onclick="setStatus('${ev.id}','pendiente')">Pend.</button>
+            <button class="status-pill${status==='en-proceso'?' active-en-proceso':''}" data-status="en-proceso" onclick="setStatus('${ev.id}','en-proceso')">Curso</button>
+            <button class="status-pill${status==='completado'?' active-completado':''}" data-status="completado" onclick="setStatus('${ev.id}','completado')">Listo</button>
+          </div>
+        </div>`;
+      });
+    }
+    html+=`</div></div>`;
+  });
+  html+=`</div>`;
+  wrap.innerHTML=html;
+}
+
+// ── Overlay helpers ──
+window.openOverlay  = function(id){document.getElementById(id).classList.add('open');};
+window.closeOverlay = function(id){document.getElementById(id).classList.remove('open');};
+window.handleOverlayClick = function(e,id){if(e.target===document.getElementById(id))closeOverlay(id);};
+
+// ── Utils ──
+function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,6);}
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function fmtTime(t){if(!t)return'';const[h,m]=t.split(':');const hr=parseInt(h);return`${hr%12||12}:${m}${hr>=12?'pm':'am'}`;}
+function fmtDate(d){if(!d)return'';const[,mo,day]=d.split('-');const months=['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];return`${parseInt(day)} ${months[parseInt(mo)-1]}`;}
+function showEl(id){document.getElementById(id).style.display='block';}
+function hideEl(id){document.getElementById(id).style.display='none';}
+function setErr(id,msg){document.getElementById(id).textContent=msg;}
+function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');clearTimeout(t._to);t._to=setTimeout(()=>t.classList.remove('show'),2800);}
+function setSyncLabel(msg){const el=document.getElementById('sync-label');if(el)el.textContent=msg;}
+function setDot(state){
+  const d=document.getElementById('sync-dot'); if(!d)return;
+  d.className='sync-dot'+(state==='offline'?' offline':'');
+}
+
+// ── Boot ──
+initLoginScreen();
+</script>
+</body>
+</html>
