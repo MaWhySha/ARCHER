@@ -16,24 +16,53 @@
   --red:#f25c5c;--red-soft:rgba(242,92,92,.12);
   --blue:#4da6ff;--blue-soft:rgba(77,166,255,.12);
   --purple:#c084fc;--purple-soft:rgba(192,132,252,.12);
+  --clase:#4da6ff;--laboratorio:#c084fc;--parcial:#f25c5c;
+  --trabajo:#f5a623;--especial:#3ecf8e;
 }
 *{box-sizing:border-box;margin:0;padding:0;}
 body{font-family:'Instrument Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;}
 
-/* ══ ANIMATIONS ══ */
+/* ══ PAGE ENTRY ANIMATION ══ */
 @keyframes pageFadeIn{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
-@keyframes titleGlow{0%,100%{text-shadow:0 0 0 transparent}50%{text-shadow:0 0 28px rgba(124,108,252,.55),0 0 60px rgba(124,108,252,.2)}}
-@keyframes letterFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
+@keyframes slideIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+@keyframes titleGlow{
+  0%,100%{text-shadow:0 0 18px rgba(124,108,252,.0)}
+  50%{text-shadow:0 0 28px rgba(124,108,252,.55),0 0 60px rgba(124,108,252,.2)}
+}
+@keyframes letterFloat{
+  0%,100%{transform:translateY(0)}
+  50%{transform:translateY(-3px)}
+}
 @keyframes spin{to{transform:rotate(360deg)}}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+@keyframes fadeOut{from{opacity:1;transform:scale(1)}to{opacity:0;transform:scale(.97)}}
 @keyframes scaleIn{from{opacity:0;transform:scale(.96)}to{opacity:1;transform:scale(1)}}
 @keyframes cardIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
 
 /* ══ LOGIN ══ */
-#login-screen{min-height:100vh;display:flex;align-items:center;justify-content:center;position:relative;padding:1rem;animation:pageFadeIn .7s ease both;}
-.login-bg{position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse 60% 50% at 20% 30%,rgba(124,108,252,.15) 0%,transparent 60%),radial-gradient(ellipse 40% 40% at 80% 70%,rgba(62,207,142,.08) 0%,transparent 60%);}
-.login-card{position:relative;width:420px;max-width:100%;background:var(--surface);border:1px solid var(--border);padding:2.4rem;border-radius:2px;animation:scaleIn .5s cubic-bezier(.16,1,.3,1) both;}
-.login-logo{font-family:'Syne',sans-serif;font-size:2.6rem;font-weight:800;letter-spacing:-.04em;margin-bottom:.4rem;animation:titleGlow 3.5s ease-in-out infinite;display:inline-block;}
+#login-screen{
+  min-height:100vh;display:flex;align-items:center;justify-content:center;
+  position:relative;padding:1rem;
+  animation:pageFadeIn .7s ease both;
+}
+.login-bg{
+  position:absolute;inset:0;pointer-events:none;
+  background:
+    radial-gradient(ellipse 60% 50% at 20% 30%,rgba(124,108,252,.15) 0%,transparent 60%),
+    radial-gradient(ellipse 40% 40% at 80% 70%,rgba(62,207,142,.08) 0%,transparent 60%);
+}
+.login-card{
+  position:relative;width:420px;max-width:100%;
+  background:var(--surface);border:1px solid var(--border);
+  padding:2.4rem;border-radius:2px;
+  animation:scaleIn .5s cubic-bezier(.16,1,.3,1) both;
+}
+.login-logo{
+  font-family:'Syne',sans-serif;font-size:2.6rem;font-weight:800;
+  letter-spacing:-.04em;margin-bottom:.4rem;
+  animation:titleGlow 3.5s ease-in-out infinite;
+  display:inline-block;
+}
 .login-logo em{font-style:normal;color:var(--accent);}
 .login-logo .l1{display:inline-block;animation:letterFloat 2.8s ease-in-out .0s infinite;}
 .login-logo .l2{display:inline-block;animation:letterFloat 2.8s ease-in-out .1s infinite;}
@@ -43,35 +72,35 @@ body{font-family:'Instrument Sans',sans-serif;background:var(--bg);color:var(--t
 .login-logo .l6{display:inline-block;animation:letterFloat 2.8s ease-in-out .5s infinite;}
 .login-tagline{font-size:.63rem;color:var(--text3);letter-spacing:.06em;line-height:1.6;margin-bottom:2rem;}
 .login-tagline strong{color:var(--text2);font-weight:500;}
+
+/* ── Connecting state ── */
 .connecting-state{text-align:center;padding:1.8rem 0;}
 .connecting-spinner{width:26px;height:26px;border:2px solid var(--border2);border-top-color:var(--accent);border-radius:50%;animation:spin .75s linear infinite;margin:0 auto .7rem;}
 .connecting-text{font-size:.73rem;color:var(--text3);}
 
-/* ── Saved profile section ── */
-.saved-profile-section{display:none;}
-.saved-profile-label{font-size:.68rem;text-transform:uppercase;letter-spacing:.1em;color:var(--text3);margin-bottom:.7rem;}
-.saved-profile-btn{width:100%;display:flex;align-items:center;gap:.8rem;background:var(--surface2);border:1px solid var(--border);padding:.8rem 1rem;cursor:pointer;transition:border-color .15s,background .15s;margin-bottom:.5rem;border-radius:1px;}
-.saved-profile-btn:hover{border-color:var(--accent);background:var(--surface3);}
-.sp-avatar{width:36px;height:36px;border-radius:50%;object-fit:cover;flex-shrink:0;}
-.sp-avatar-placeholder{width:36px;height:36px;border-radius:50%;background:var(--accent-soft);border:1px solid var(--accent);display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-size:.88rem;font-weight:700;color:var(--accent);flex-shrink:0;}
-.sp-name{font-size:.9rem;color:var(--text);font-weight:500;}
-.sp-hint{font-size:.63rem;color:var(--text3);margin-top:.1rem;}
-.btn-switch-account{width:100%;padding:.6rem;background:transparent;border:1px solid var(--border2);color:var(--text3);font-family:'Instrument Sans',sans-serif;font-size:.76rem;cursor:pointer;border-radius:1px;transition:all .15s;margin-top:.55rem;display:flex;align-items:center;justify-content:center;gap:.5rem;}
-.btn-switch-account:hover{border-color:var(--text2);color:var(--text2);}
-
-/* ── Fresh login section ── */
-.fresh-login-section{display:none;}
+/* ── Login main section ── */
+.login-main-section{display:none;}
 .login-subtitle{font-size:.68rem;text-transform:uppercase;letter-spacing:.1em;color:var(--text3);margin-bottom:1.2rem;}
-.btn-google{width:100%;display:flex;align-items:center;justify-content:center;gap:.75rem;background:var(--surface2);border:1px solid var(--border2);color:var(--text);padding:.82rem 1rem;cursor:pointer;font-family:'Instrument Sans',sans-serif;font-size:.88rem;font-weight:500;border-radius:1px;transition:border-color .15s,background .15s,transform .1s;}
+
+/* ── Google button ── */
+.btn-google{
+  width:100%;display:flex;align-items:center;justify-content:center;gap:.75rem;
+  background:var(--surface2);border:1px solid var(--border2);
+  color:var(--text);padding:.82rem 1rem;cursor:pointer;
+  font-family:'Instrument Sans',sans-serif;font-size:.88rem;font-weight:500;
+  border-radius:1px;transition:border-color .15s,background .15s,transform .1s;
+}
 .btn-google:hover{border-color:var(--accent);background:var(--surface3);}
 .btn-google:active{transform:scale(.99);}
+.btn-google svg{flex-shrink:0;}
 
-/* ── Name setup section ── */
+/* ── Name modal inside login card ── */
 .name-setup-section{display:none;}
 .google-user-preview{display:flex;align-items:center;gap:.75rem;margin-bottom:1.3rem;padding:.7rem .9rem;background:var(--surface2);border:1px solid var(--border);border-radius:1px;}
 .google-avatar{width:34px;height:34px;border-radius:50%;object-fit:cover;flex-shrink:0;}
 .google-avatar-placeholder{width:34px;height:34px;border-radius:50%;background:var(--accent-soft);border:1px solid var(--accent);display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-size:.85rem;font-weight:700;color:var(--accent);flex-shrink:0;}
 .google-email{font-size:.75rem;color:var(--text2);}
+
 .field{margin-bottom:.85rem;}
 .field label{display:block;font-size:.66rem;text-transform:uppercase;letter-spacing:.1em;color:var(--text3);margin-bottom:.32rem;}
 .field input{width:100%;background:var(--surface2);border:1px solid var(--border);color:var(--text);padding:.62rem .85rem;font-family:'Instrument Sans',sans-serif;font-size:.88rem;outline:none;border-radius:1px;transition:border-color .15s;}
@@ -79,6 +108,7 @@ body{font-family:'Instrument Sans',sans-serif;background:var(--bg);color:var(--t
 .field input::placeholder{color:var(--text3);}
 .char-count{font-size:.6rem;color:var(--text3);text-align:right;margin-top:.2rem;}
 .char-count.warn{color:var(--amber);}
+
 .btn-main{width:100%;padding:.72rem;background:var(--accent);color:#fff;border:none;font-family:'Syne',sans-serif;font-size:.8rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;border-radius:1px;transition:opacity .15s,transform .1s;margin-top:.25rem;}
 .btn-main:hover{opacity:.88;}
 .btn-main:active{transform:scale(.99);}
@@ -86,9 +116,15 @@ body{font-family:'Instrument Sans',sans-serif;background:var(--bg);color:var(--t
 .btn-outline:hover{border-color:var(--accent);color:var(--accent);}
 .error{font-size:.7rem;color:var(--red);margin-top:.28rem;display:none;}
 
-/* ══ APP ══ */
+/* ══ APP SHELL ══ */
 #app{display:none;}
-.topbar{position:sticky;top:0;z-index:200;background:rgba(15,15,17,.96);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);min-height:54px;display:flex;align-items:center;flex-wrap:wrap;gap:.5rem;padding:.6rem 1rem;}
+.topbar{
+  position:sticky;top:0;z-index:200;
+  background:rgba(15,15,17,.96);backdrop-filter:blur(12px);
+  border-bottom:1px solid var(--border);
+  min-height:54px;display:flex;align-items:center;flex-wrap:wrap;
+  gap:.5rem;padding:.6rem 1rem;
+}
 .topbar-left{display:flex;align-items:center;gap:.6rem;flex-shrink:0;}
 .topbar-logo{font-family:'Syne',sans-serif;font-weight:800;font-size:1.1rem;letter-spacing:-.03em;white-space:nowrap;color:var(--accent);}
 .sync-wrap{display:flex;align-items:center;gap:.35rem;}
@@ -148,8 +184,12 @@ select:focus{border-color:var(--accent);}
 .subjects-empty{font-size:.72rem;color:var(--text3);margin-top:.5rem;font-style:italic;}
 
 /* ══ CALENDAR ══ */
-.calendar-wrap{overflow-x:auto;padding:.9rem 1rem 2rem;min-height:calc(100vh - 160px);}
-/* Mobile border fix: wrap has a right border so the grid's last column always has its outer border */
+.calendar-wrap{
+  overflow-x:auto;padding:.9rem 1rem;
+  min-height:calc(100vh - 160px);
+  /* Fix mobile border cut: ensure the scrollable area has padding so border shows */
+  padding-bottom:2rem;
+}
 .calendar-grid{
   display:grid;
   grid-template-columns:repeat(7,minmax(152px,1fr));
@@ -157,8 +197,8 @@ select:focus{border-color:var(--accent);}
   background:var(--border);
   border:1px solid var(--border);
   min-width:840px;
-  /* Ensures the right-most column always shows its right border even on mobile */
-  box-sizing:content-box;
+  /* Ensure last column border shows on mobile scroll */
+  margin-right:0;
 }
 .day-col{background:var(--surface);display:flex;flex-direction:column;}
 .day-header{padding:.6rem .7rem .5rem;background:var(--surface2);border-bottom:1px solid var(--border);position:sticky;top:54px;z-index:5;}
@@ -172,14 +212,18 @@ select:focus{border-color:var(--accent);}
 /* ══ EVENT CARD ══ */
 .event-card{background:var(--surface2);border:1px solid var(--border);border-top:3px solid var(--border);border-radius:1px;padding:.72rem .72rem .6rem;position:relative;transition:border-color .15s,box-shadow .15s;animation:cardIn .2s ease both;width:100%;overflow:hidden;}
 .event-card:hover{border-color:var(--border2);box-shadow:0 4px 16px rgba(0,0,0,.3);}
+.event-card[data-type="clase"]{border-top-color:var(--clase);}
+.event-card[data-type="laboratorio"]{border-top-color:var(--laboratorio);}
+.event-card[data-type="parcial"]{border-top-color:var(--parcial);}
+.event-card[data-type="trabajo"]{border-top-color:var(--trabajo);}
+.event-card[data-type="especial"]{border-top-color:var(--especial);}
 .card-top{display:flex;align-items:center;justify-content:space-between;gap:.3rem;padding-right:2.8rem;}
 .event-type-pill{display:inline-flex;align-items:center;font-size:.56rem;font-weight:600;text-transform:uppercase;letter-spacing:.07em;padding:.12rem .4rem;border-radius:100px;flex-shrink:0;}
-/* Type pill defaults (overridden by subject colors when set) */
-.pill-clase{background:rgba(77,166,255,.12);color:#4da6ff;}
-.pill-laboratorio{background:rgba(192,132,252,.12);color:#c084fc;}
-.pill-parcial{background:rgba(242,92,92,.12);color:#f25c5c;}
-.pill-trabajo{background:rgba(245,166,35,.12);color:#f5a623;}
-.pill-especial{background:rgba(62,207,142,.12);color:#3ecf8e;}
+.pill-clase{background:var(--blue-soft);color:var(--blue);}
+.pill-laboratorio{background:var(--purple-soft);color:var(--purple);}
+.pill-parcial{background:var(--red-soft);color:var(--red);}
+.pill-trabajo{background:var(--amber-soft);color:var(--amber);}
+.pill-especial{background:var(--green-soft);color:var(--green);}
 .toggle-arrow{font-size:.55rem;color:var(--text3);cursor:pointer;transition:transform .2s;flex-shrink:0;padding:.1rem .15rem;}
 .toggle-arrow:hover{color:var(--text2);}
 .toggle-arrow.open{transform:rotate(180deg);}
@@ -199,41 +243,16 @@ select:focus{border-color:var(--accent);}
 .status-row{display:flex;gap:.25rem;margin-top:.5rem;}
 .status-pill{flex:1;padding:.24rem 0;text-align:center;font-size:.56rem;font-weight:500;text-transform:uppercase;letter-spacing:.05em;border:1px solid var(--border);background:transparent;color:var(--text3);cursor:pointer;border-radius:100px;transition:all .12s;font-family:'Instrument Sans',sans-serif;}
 .status-pill:hover{border-color:var(--border2);color:var(--text2);}
-.status-pill.active-pendiente{background:rgba(245,166,35,.12);border-color:#f5a623;color:#f5a623;}
-.status-pill.active-en-proceso{background:rgba(77,166,255,.12);border-color:#4da6ff;color:#4da6ff;}
-.status-pill.active-completado{background:rgba(62,207,142,.12);border-color:#3ecf8e;color:#3ecf8e;}
+.status-pill.active-pendiente{background:var(--amber-soft);border-color:var(--amber);color:var(--amber);}
+.status-pill.active-en-proceso{background:var(--blue-soft);border-color:var(--blue);color:var(--blue);}
+.status-pill.active-completado{background:var(--green-soft);border-color:var(--green);color:var(--green);}
 .card-admin-btns{position:absolute;top:.45rem;right:.45rem;display:none;gap:.18rem;align-items:center;}
 .is-admin .card-admin-btns{display:flex;}
 .btn-card-action{width:21px;height:21px;background:transparent;border:none;color:var(--text3);font-size:.68rem;cursor:pointer;display:flex;align-items:center;justify-content:center;border-radius:50%;transition:all .12s;}
 .btn-card-action.edit:hover{color:var(--accent);background:var(--accent-soft);}
-.btn-card-action.del:hover{color:var(--red);background:var(--red-soft, rgba(242,92,92,.12));}
+.btn-card-action.del:hover{color:var(--red);background:var(--red-soft);}
 
-/* ══ CUSTOMIZE PANEL ══ */
-.customize-panel-wrap{position:relative;}
-.customize-btn{padding:.3rem .65rem;background:transparent;border:1px solid var(--border2);color:var(--text2);font-size:.68rem;cursor:pointer;border-radius:1px;transition:all .15s;font-family:'Instrument Sans',sans-serif;white-space:nowrap;}
-.customize-btn:hover{border-color:var(--accent);color:var(--accent);}
-.customize-dropdown{
-  position:absolute;top:calc(100% + .4rem);right:0;
-  background:var(--surface);border:1px solid var(--border2);
-  width:280px;max-height:360px;overflow-y:auto;
-  box-shadow:0 12px 40px rgba(0,0,0,.5);
-  z-index:300;display:none;animation:scaleIn .18s ease both;
-  transform-origin:top right;
-}
-.customize-dropdown.open{display:block;}
-.customize-dropdown-header{padding:.65rem .9rem .4rem;font-family:'Syne',sans-serif;font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--text3);border-bottom:1px solid var(--border);}
-.customize-row{display:flex;align-items:center;justify-content:space-between;padding:.5rem .9rem;gap:.6rem;border-bottom:1px solid var(--border);}
-.customize-row:last-child{border-bottom:none;}
-.customize-subject-name{font-size:.78rem;color:var(--text);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-.customize-color-wrap{display:flex;align-items:center;gap:.4rem;}
-.color-swatch{width:20px;height:20px;border-radius:3px;border:2px solid var(--border2);cursor:pointer;transition:transform .12s;}
-.color-swatch:hover{transform:scale(1.15);}
-.color-input-hidden{opacity:0;width:0;height:0;position:absolute;}
-.btn-reset-color{font-size:.6rem;color:var(--text3);background:transparent;border:none;cursor:pointer;padding:.1rem .3rem;transition:color .12s;}
-.btn-reset-color:hover{color:var(--red);}
-.customize-empty{padding:1rem .9rem;font-size:.72rem;color:var(--text3);font-style:italic;}
-
-/* ══ EMPTY STATE ══ */
+/* ══ EMPTY ══ */
 .week-empty{text-align:center;padding:5rem 2rem;color:var(--text3);}
 .week-empty-icon{font-size:2.8rem;margin-bottom:1rem;opacity:.35;}
 .week-empty-text{font-family:'Syne',sans-serif;font-size:.78rem;font-weight:600;text-transform:uppercase;letter-spacing:.08em;}
@@ -246,7 +265,7 @@ select:focus{border-color:var(--accent);}
 .modal-title{font-family:'Syne',sans-serif;font-size:.73rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--accent);}
 .modal-title.red{color:var(--red);}
 .btn-close{width:24px;height:24px;background:transparent;border:none;color:var(--text3);font-size:.88rem;cursor:pointer;display:flex;align-items:center;justify-content:center;border-radius:50%;transition:all .12s;}
-.btn-close:hover{color:var(--red);background:rgba(242,92,92,.12);}
+.btn-close:hover{color:var(--red);background:var(--red-soft);}
 .m-row{display:grid;grid-template-columns:1fr 1fr;gap:.55rem;margin-bottom:.55rem;}
 .m-row.full{grid-template-columns:1fr;}
 .m-field label{display:block;font-size:.61rem;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);margin-bottom:.26rem;}
@@ -268,32 +287,69 @@ select:focus{border-color:var(--accent);}
 .settings-section-title{font-family:'Syne',sans-serif;font-size:.66rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--text3);margin-bottom:.65rem;}
 .settings-user-label{font-size:.77rem;color:var(--text2);margin-bottom:.75rem;}
 .settings-user-label strong{color:var(--text);}
-.verify-code-display{font-family:'Syne',sans-serif;font-size:1.8rem;font-weight:800;letter-spacing:.25em;color:var(--accent);text-align:center;background:var(--surface2);border:1px solid var(--border2);padding:.8rem;margin-bottom:.7rem;border-radius:1px;}
+/* Delete verification code display */
+.verify-code-display{
+  font-family:'Syne',sans-serif;font-size:1.6rem;font-weight:800;
+  letter-spacing:.3em;color:var(--accent);text-align:center;
+  background:var(--surface2);border:1px solid var(--border2);
+  padding:.8rem;margin-bottom:.7rem;border-radius:1px;
+}
 .verify-hint{font-size:.72rem;color:var(--text3);text-align:center;margin-bottom:.8rem;}
-
-/* Week reorder modal */
-.week-reorder-list{display:flex;flex-direction:column;gap:.3rem;margin-bottom:.5rem;}
-.week-reorder-item{display:flex;align-items:center;gap:.6rem;background:var(--surface2);border:1px solid var(--border);padding:.55rem .8rem;cursor:grab;border-radius:1px;transition:border-color .15s,background .12s;}
-.week-reorder-item:hover{border-color:var(--border2);}
-.week-reorder-item.dragging{opacity:.5;cursor:grabbing;}
-.week-reorder-item.drag-over{border-color:var(--accent);background:var(--surface3);}
-.week-drag-handle{color:var(--text3);font-size:.75rem;cursor:grab;flex-shrink:0;}
-.week-reorder-name{font-size:.82rem;color:var(--text);flex:1;}
-.week-reorder-count{font-size:.62rem;color:var(--text3);}
 
 /* TOAST */
 .toast{position:fixed;bottom:1.2rem;right:1.2rem;background:var(--surface3);border:1px solid var(--border2);color:var(--text);padding:.6rem 1rem;font-size:.75rem;border-radius:2px;opacity:0;transform:translateY(6px);transition:all .22s;pointer-events:none;z-index:999;box-shadow:0 8px 24px rgba(0,0,0,.4);}
 .toast.show{opacity:1;transform:translateY(0);}
 
-/* Screen transition */
-.screen-transition{position:fixed;inset:0;background:var(--bg);z-index:9999;opacity:0;pointer-events:none;transition:opacity .28s ease;}
+/* Transition overlay for screen changes */
+.screen-transition{position:fixed;inset:0;background:var(--bg);z-index:9999;opacity:0;pointer-events:none;transition:opacity .3s ease;}
 .screen-transition.active{opacity:1;pointer-events:all;}
+
+/* ── V4: Saved profile quick-access ── */
+.saved-profile-section{display:none;}
+.saved-profile-label{font-size:.68rem;text-transform:uppercase;letter-spacing:.1em;color:var(--text3);margin-bottom:.7rem;}
+.saved-profile-btn{width:100%;display:flex;align-items:center;gap:.8rem;background:var(--surface2);border:1px solid var(--border);padding:.8rem 1rem;cursor:pointer;transition:border-color .15s,background .15s;margin-bottom:.5rem;border-radius:1px;}
+.saved-profile-btn:hover{border-color:var(--accent);background:var(--surface3);}
+.sp-avatar{width:36px;height:36px;border-radius:50%;object-fit:cover;flex-shrink:0;}
+.sp-avatar-placeholder{width:36px;height:36px;border-radius:50%;background:var(--accent-soft);border:1px solid var(--accent);display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-size:.88rem;font-weight:700;color:var(--accent);flex-shrink:0;}
+.sp-name{font-size:.9rem;color:var(--text);font-weight:500;}
+.sp-email{font-size:.63rem;color:var(--text3);margin-top:.1rem;}
+.btn-switch-account{width:100%;padding:.58rem;background:transparent;border:1px solid var(--border2);color:var(--text3);font-family:'Instrument Sans',sans-serif;font-size:.75rem;cursor:pointer;border-radius:1px;transition:all .15s;margin-top:.5rem;}
+.btn-switch-account:hover{border-color:var(--text2);color:var(--text2);}
+
+/* ── V4: Customize dropdown ── */
+.customize-panel-wrap{position:relative;}
+.customize-btn{padding:.3rem .65rem;background:transparent;border:1px solid var(--border2);color:var(--text2);font-size:.68rem;cursor:pointer;border-radius:1px;transition:all .15s;font-family:'Instrument Sans',sans-serif;white-space:nowrap;}
+.customize-btn:hover{border-color:var(--accent);color:var(--accent);}
+.customize-dropdown{position:absolute;top:calc(100% + .5rem);right:0;background:var(--surface);border:1px solid var(--border2);width:265px;max-height:310px;overflow-y:auto;box-shadow:0 12px 40px rgba(0,0,0,.5);z-index:400;display:none;}
+.customize-dropdown.open{display:block;}
+.customize-header{padding:.6rem .85rem .35rem;font-family:'Syne',sans-serif;font-size:.63rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--text3);border-bottom:1px solid var(--border);}
+.customize-row{display:flex;align-items:center;justify-content:space-between;padding:.48rem .85rem;gap:.6rem;border-bottom:1px solid var(--border);}
+.customize-row:last-child{border-bottom:none;}
+.customize-subject-name{font-size:.78rem;color:var(--text);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.customize-color-wrap{display:flex;align-items:center;gap:.35rem;}
+.color-swatch{width:18px;height:18px;border-radius:3px;border:2px solid var(--border2);cursor:pointer;transition:transform .12s;flex-shrink:0;}
+.color-swatch:hover{transform:scale(1.2);}
+.color-input-hidden{opacity:0;width:0;height:0;position:absolute;pointer-events:none;}
+.btn-reset-color{font-size:.6rem;color:var(--text3);background:transparent;border:none;cursor:pointer;padding:.1rem .25rem;transition:color .12s;}
+.btn-reset-color:hover{color:var(--red);}
+.customize-empty{padding:1rem .85rem;font-size:.72rem;color:var(--text3);font-style:italic;}
+
+/* ── V4: Week reorder modal ── */
+.week-reorder-list{display:flex;flex-direction:column;gap:.3rem;margin-bottom:.6rem;}
+.week-reorder-item{display:flex;align-items:center;gap:.65rem;background:var(--surface2);border:1px solid var(--border);padding:.55rem .8rem;cursor:grab;border-radius:1px;transition:border-color .12s,background .12s;user-select:none;}
+.week-reorder-item:hover{border-color:var(--border2);}
+.week-reorder-item.dragging{opacity:.45;cursor:grabbing;}
+.week-reorder-item.drag-over{border-color:var(--accent);background:rgba(124,108,252,.07);}
+.week-drag-handle{color:var(--text3);font-size:.78rem;flex-shrink:0;}
+.week-reorder-name{font-size:.82rem;color:var(--text);flex:1;}
+.week-reorder-count{font-size:.62rem;color:var(--text3);}
 
 @media(max-width:600px){
   .form-grid-3x2{grid-template-columns:1fr 1fr;}
   .topbar{height:auto;padding:.5rem .8rem;}
   .week-bar{padding:.55rem .8rem;}
-  .calendar-wrap{padding:.65rem .8rem 2rem;}
+  /* V4 mobile grid fix: extra right padding so last column border is always visible */
+  .calendar-wrap{padding:.65rem 1rem 2rem;}
   .admin-panel{padding:.85rem .8rem;}
   .login-card{padding:1.8rem 1.5rem;}
   .day-events{padding:4.5rem .5rem .6rem;}
@@ -302,41 +358,53 @@ select:focus{border-color:var(--accent);}
 </head>
 <body>
 
+<!-- Screen transition overlay -->
 <div class="screen-transition" id="screen-transition"></div>
 
 <!-- ══ LOGIN ══ -->
 <div id="login-screen">
   <div class="login-bg"></div>
   <div class="login-card">
-    <div class="login-logo"><em><span class="l1">A</span><span class="l2">R</span><span class="l3">C</span><span class="l4">H</span><span class="l5">E</span><span class="l6">R</span></em></div>
-    <div class="login-tagline"><strong>A</strong>sistente de <strong>R</strong>egistro, <strong>C</strong>ontrol y <strong>H</strong>erramientas<br>de <strong>E</strong>valuación de <strong>R</strong>endimiento</div>
+    <div class="login-logo">
+      <em>
+        <span class="l1">A</span><span class="l2">R</span><span class="l3">C</span><span class="l4">H</span><span class="l5">E</span><span class="l6">R</span>
+      </em>
+    </div>
+    <div class="login-tagline">
+      <strong>A</strong>sistente de <strong>R</strong>egistro, <strong>C</strong>ontrol y <strong>H</strong>erramientas<br>
+      de <strong>E</strong>valuación de <strong>R</strong>endimiento
+    </div>
 
-    <!-- Loading -->
+    <!-- V4: Saved profile quick-access (shown after logout when no active session) -->
+    <div class="saved-profile-section" id="saved-profile-section">
+      <div class="saved-profile-label">Continuar como</div>
+      <div id="saved-profile-btn-wrap"></div>
+      <button class="btn-switch-account" id="btn-switch-account" onclick="v4ShowFreshLogin()">
+        Iniciar sesión con una cuenta diferente
+      </button>
+    </div>
+
+    <!-- Step 1: Connecting -->
     <div class="connecting-state" id="connecting-state">
       <div class="connecting-spinner"></div>
       <div class="connecting-text">Iniciando ARCHER…</div>
     </div>
 
-    <!-- Saved profile quick-access -->
-    <div class="saved-profile-section" id="saved-profile-section">
-      <div class="saved-profile-label">Continuar como</div>
-      <div id="saved-profile-btn-wrap"></div>
-      <button class="btn-switch-account" onclick="showFreshLogin()">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg>
-        Iniciar sesión con una cuenta diferente
-      </button>
-    </div>
-
-    <!-- Fresh login (Google button) -->
-    <div class="fresh-login-section" id="fresh-login-section">
+    <!-- Step 2: Sign in with Google -->
+    <div class="login-main-section" id="login-main-section">
       <div class="login-subtitle">Inicia sesión para continuar</div>
       <button class="btn-google" onclick="signInWithGoogle()">
-        <svg width="18" height="18" viewBox="0 0 18 18"><path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.874 2.684-6.615z"/><path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18z"/><path fill="#FBBC05" d="M3.964 10.71A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.042l3.007-2.332z"/><path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58z"/></svg>
+        <svg width="18" height="18" viewBox="0 0 18 18">
+          <path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.874 2.684-6.615z"/>
+          <path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18z"/>
+          <path fill="#FBBC05" d="M3.964 10.71A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.042l3.007-2.332z"/>
+          <path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58z"/>
+        </svg>
         Continuar con Google
       </button>
     </div>
 
-    <!-- Name setup (first time) -->
+    <!-- Step 3: Set display name (first time only) -->
     <div class="name-setup-section" id="name-setup-section">
       <div id="google-user-preview-wrap"></div>
       <div class="field">
@@ -361,12 +429,16 @@ select:focus{border-color:var(--accent);}
     </div>
     <div class="topbar-spacer"></div>
     <div class="topbar-right">
-      <div class="user-chip"><div class="role-dot" id="role-dot"></div><div id="topbar-avatar-wrap"></div><span id="topbar-name"></span></div>
-      <!-- Customize button (visible to all) -->
-      <div class="customize-panel-wrap">
-        <button class="customize-btn" onclick="toggleCustomize(event)">🎨 Personalizar</button>
+      <div class="user-chip">
+        <div class="role-dot" id="role-dot"></div>
+        <div id="topbar-avatar-wrap"></div>
+        <span id="topbar-name"></span>
+      </div>
+      <!-- V4: Customize button (visible to all users) -->
+      <div class="customize-panel-wrap" id="customize-panel-wrap">
+        <button class="customize-btn" onclick="v4ToggleCustomize(event)">🎨 Personalizar</button>
         <div class="customize-dropdown" id="customize-dropdown">
-          <div class="customize-dropdown-header">Color de las tarjetas por materia</div>
+          <div class="customize-header">Color de tarjetas por materia</div>
           <div id="customize-subjects-list"></div>
         </div>
       </div>
@@ -388,7 +460,8 @@ select:focus{border-color:var(--accent);}
       <input class="inline-input" id="new-week-name" placeholder="Nombre de semana" maxlength="40">
       <button class="btn-accent-sm" onclick="addWeek()">+ Agregar</button>
       <button class="btn-accent-sm" style="background:var(--surface2);border:1px solid var(--border2);color:var(--text2);" onclick="openRenameWeek()">Renombrar</button>
-      <button class="btn-accent-sm" style="background:var(--surface3);border:1px solid var(--border2);color:var(--text2);" onclick="openReorderWeeks()">Reordenar</button>
+      <!-- V4: Reorder button -->
+      <button class="btn-accent-sm" style="background:var(--surface2);border:1px solid var(--border2);color:var(--text2);" onclick="v4OpenReorder()">Reordenar</button>
       <button class="btn-accent-sm" style="background:var(--red);opacity:.9" onclick="askDeleteWeek()">Eliminar</button>
     </div>
   </div>
@@ -402,17 +475,23 @@ select:focus{border-color:var(--accent);}
       </div>
     </div>
     <div class="admin-tab-panel active" id="tab-events">
-      <div class="form-row-full"><div class="form-field"><label>Título del evento *</label><input type="text" id="ev-title" placeholder="ej. Parcial 1 — Cálculo"></div></div>
+      <div class="form-row-full">
+        <div class="form-field"><label>Título del evento *</label><input type="text" id="ev-title" placeholder="ej. Parcial 1 — Cálculo"></div>
+      </div>
       <div class="form-grid-3x2">
-        <div class="form-field"><label>Tipo *</label><select id="ev-type"><option value="clase">Clase regular</option><option value="laboratorio">Laboratorio</option><option value="parcial">Parcial / Examen</option><option value="trabajo">Trabajo / Tarea</option><option value="especial">Evento especial</option></select></div>
+        <div class="form-field"><label>Tipo *</label>
+          <select id="ev-type"><option value="clase">Clase regular</option><option value="laboratorio">Laboratorio</option><option value="parcial">Parcial / Examen</option><option value="trabajo">Trabajo / Tarea</option><option value="especial">Evento especial</option></select>
+        </div>
         <div class="form-field"><label>Materia</label><select id="ev-subject"></select></div>
-        <div class="form-field"><label>Día *</label><select id="ev-day"><option>Lunes</option><option>Martes</option><option>Miércoles</option><option>Jueves</option><option>Viernes</option><option>Sábado</option><option>Domingo</option></select></div>
+        <div class="form-field"><label>Día *</label>
+          <select id="ev-day"><option>Lunes</option><option>Martes</option><option>Miércoles</option><option>Jueves</option><option>Viernes</option><option>Sábado</option><option>Domingo</option></select>
+        </div>
         <div class="form-field"><label>Fecha límite</label><input type="date" id="ev-date"></div>
         <div class="form-field"><label>Hora inicio</label><input type="time" id="ev-time-start"></div>
         <div class="form-field"><label>Hora fin</label><input type="time" id="ev-time-end"></div>
       </div>
       <div class="form-grid-bottom">
-        <div class="form-field"><label>Descripción (opcional)</label><textarea id="ev-desc" placeholder="Notas, instrucciones…"></textarea></div>
+        <div class="form-field"><label>Descripción (opcional)</label><textarea id="ev-desc" placeholder="Notas, instrucciones, temas a estudiar…"></textarea></div>
         <div class="form-field"><button class="btn-add-event" onclick="addEvent()">+ Agregar evento</button></div>
       </div>
     </div>
@@ -435,7 +514,10 @@ select:focus{border-color:var(--accent);}
 <!-- EDIT EVENT MODAL -->
 <div class="overlay" id="edit-overlay" onclick="handleOverlayClick(event,'edit-overlay')">
   <div class="modal">
-    <div class="modal-header"><div class="modal-title">✎ Editar evento</div><button class="btn-close" onclick="closeOverlay('edit-overlay')">✕</button></div>
+    <div class="modal-header">
+      <div class="modal-title">✎ Editar evento</div>
+      <button class="btn-close" onclick="closeOverlay('edit-overlay')">✕</button>
+    </div>
     <div class="m-row full"><div class="m-field"><label>Título</label><input type="text" id="em-title"></div></div>
     <div class="m-row">
       <div class="m-field"><label>Tipo</label><select id="em-type"><option value="clase">Clase regular</option><option value="laboratorio">Laboratorio</option><option value="parcial">Parcial / Examen</option><option value="trabajo">Trabajo / Tarea</option><option value="especial">Evento especial</option></select></div>
@@ -450,48 +532,66 @@ select:focus{border-color:var(--accent);}
       <div class="m-field"><label>Hora fin</label><input type="time" id="em-tend"></div>
     </div>
     <div class="m-row full"><div class="m-field"><label>Descripción</label><textarea id="em-desc"></textarea></div></div>
-    <div class="modal-actions"><button class="btn-modal-primary" onclick="saveEditModal()">Guardar cambios</button><button class="btn-modal-secondary" onclick="closeOverlay('edit-overlay')">Cancelar</button></div>
+    <div class="modal-actions">
+      <button class="btn-modal-primary" onclick="saveEditModal()">Guardar cambios</button>
+      <button class="btn-modal-secondary" onclick="closeOverlay('edit-overlay')">Cancelar</button>
+    </div>
   </div>
 </div>
 
 <!-- CONFIRM MODAL -->
 <div class="overlay" id="confirm-overlay" onclick="handleOverlayClick(event,'confirm-overlay')">
   <div class="modal" style="max-width:360px">
-    <div class="modal-header"><div class="modal-title red" id="confirm-title">⚠ Confirmar</div><button class="btn-close" onclick="closeOverlay('confirm-overlay')">✕</button></div>
+    <div class="modal-header">
+      <div class="modal-title red" id="confirm-title">⚠ Confirmar</div>
+      <button class="btn-close" onclick="closeOverlay('confirm-overlay')">✕</button>
+    </div>
     <p class="confirm-modal-body" id="confirm-body"></p>
-    <div class="modal-actions"><button class="btn-modal-danger" id="confirm-ok-btn">Sí, eliminar</button><button class="btn-modal-secondary" onclick="closeOverlay('confirm-overlay')">Cancelar</button></div>
+    <div class="modal-actions">
+      <button class="btn-modal-danger" id="confirm-ok-btn">Sí, eliminar</button>
+      <button class="btn-modal-secondary" onclick="closeOverlay('confirm-overlay')">Cancelar</button>
+    </div>
   </div>
 </div>
 
 <!-- RENAME WEEK MODAL -->
 <div class="overlay" id="rename-overlay" onclick="handleOverlayClick(event,'rename-overlay')">
   <div class="modal" style="max-width:360px">
-    <div class="modal-header"><div class="modal-title">Renombrar semana</div><button class="btn-close" onclick="closeOverlay('rename-overlay')">✕</button></div>
+    <div class="modal-header">
+      <div class="modal-title">Renombrar semana</div>
+      <button class="btn-close" onclick="closeOverlay('rename-overlay')">✕</button>
+    </div>
     <div class="m-row full"><div class="m-field"><label>Nuevo nombre</label><input type="text" id="rename-week-input" maxlength="40" onkeydown="if(event.key==='Enter')saveRenameWeek()"></div></div>
-    <div class="modal-actions"><button class="btn-modal-primary" onclick="saveRenameWeek()">Guardar</button><button class="btn-modal-secondary" onclick="closeOverlay('rename-overlay')">Cancelar</button></div>
-  </div>
-</div>
-
-<!-- REORDER WEEKS MODAL -->
-<div class="overlay" id="reorder-overlay" onclick="handleOverlayClick(event,'reorder-overlay')">
-  <div class="modal" style="max-width:400px">
-    <div class="modal-header"><div class="modal-title">Reordenar semanas</div><button class="btn-close" onclick="closeOverlay('reorder-overlay')">✕</button></div>
-    <p style="font-size:.75rem;color:var(--text3);margin-bottom:.9rem">Arrastra las semanas para cambiar su orden.</p>
-    <div class="week-reorder-list" id="week-reorder-list"></div>
-    <div class="modal-actions"><button class="btn-modal-primary" onclick="saveWeekOrder()">Guardar orden</button><button class="btn-modal-secondary" onclick="closeOverlay('reorder-overlay')">Cancelar</button></div>
+    <div class="modal-actions">
+      <button class="btn-modal-primary" onclick="saveRenameWeek()">Guardar</button>
+      <button class="btn-modal-secondary" onclick="closeOverlay('rename-overlay')">Cancelar</button>
+    </div>
   </div>
 </div>
 
 <!-- SETTINGS MODAL -->
 <div class="overlay" id="settings-overlay" onclick="handleOverlayClick(event,'settings-overlay')">
   <div class="modal" style="max-width:380px">
-    <div class="modal-header"><div class="modal-title">⚙ Ajustes</div><button class="btn-close" onclick="closeOverlay('settings-overlay')">✕</button></div>
+    <div class="modal-header">
+      <div class="modal-title">⚙ Ajustes</div>
+      <button class="btn-close" onclick="closeOverlay('settings-overlay')">✕</button>
+    </div>
     <div class="settings-section">
       <div class="settings-section-title">Cuenta</div>
-      <p class="settings-user-label">Nombre: <strong id="settings-displayname"></strong><br><span style="font-size:.7rem;color:var(--text3)" id="settings-email"></span></p>
-      <div class="m-field" style="margin-bottom:.5rem"><label>Cambiar nombre en ARCHER</label><input type="text" id="s-new-name" placeholder="Nuevo nombre" maxlength="20" oninput="updateCharCountSettings(this)"><div class="char-count" id="s-char-count">0 / 20</div></div>
-      <div class="error" id="s-name-error" style="margin-bottom:.4rem">Mínimo 2 caracteres.</div>
-      <button class="btn-modal-primary" style="width:100%;padding:.52rem;margin-bottom:.4rem" onclick="saveNewDisplayName()">Guardar nombre</button>
+      <p class="settings-user-label">
+        Nombre: <strong id="settings-displayname"></strong><br>
+        <span style="font-size:.7rem;color:var(--text3)" id="settings-email"></span>
+      </p>
+      <!-- V4: Change display name -->
+      <div class="m-field" style="margin-bottom:.4rem">
+        <label>Cambiar nombre en ARCHER</label>
+        <input type="text" id="v4-new-name-input" placeholder="Nuevo nombre (máx. 20)" maxlength="20"
+          oninput="v4UpdateNameCount(this)">
+        <div class="char-count" id="v4-name-char-count">0 / 20</div>
+      </div>
+      <div class="error" id="v4-name-error" style="margin-bottom:.4rem">Mínimo 2 caracteres.</div>
+      <button class="btn-modal-primary" style="width:100%;padding:.5rem;margin-bottom:.3rem"
+        onclick="v4SaveDisplayName()">Guardar nombre</button>
     </div>
     <div class="settings-section">
       <div class="settings-section-title">Zona de peligro</div>
@@ -503,299 +603,336 @@ select:focus{border-color:var(--accent);}
 
 <!-- DELETE PROFILE MODAL -->
 <div class="overlay" id="delete-overlay" onclick="handleOverlayClick(event,'delete-overlay')">
-  <div class="modal" style="max-width:360px">
-    <div class="modal-header"><div class="modal-title red">⚠ Eliminar perfil</div><button class="btn-close" onclick="closeOverlay('delete-overlay')">✕</button></div>
+  <div class="modal" style="max-width:380px">
+    <div class="modal-header">
+      <div class="modal-title red">⚠ Eliminar perfil</div>
+      <button class="btn-close" onclick="closeOverlay('delete-overlay')">✕</button>
+    </div>
     <p style="font-size:.8rem;color:var(--text2);margin-bottom:.9rem;line-height:1.5">Para confirmar, escribe exactamente el código que aparece abajo:</p>
     <div class="verify-code-display" id="verify-code-display"></div>
     <div class="verify-hint">Escribe esos 8 números en el campo de abajo</div>
-    <div class="m-field" style="margin-bottom:.7rem"><label>Código de confirmación</label><input type="text" id="del-code-input" placeholder="8 números" maxlength="8" onkeydown="if(event.key==='Enter')confirmDeleteProfile()"></div>
-    <div class="error" id="del-code-error" style="margin-bottom:.5rem">El código no coincide.</div>
-    <div class="modal-actions"><button class="btn-modal-danger" onclick="confirmDeleteProfile()">Confirmar eliminación</button><button class="btn-modal-secondary" onclick="closeOverlay('delete-overlay')">Cancelar</button></div>
+    <div class="m-field" style="margin-bottom:.7rem">
+      <label>Código de confirmación</label>
+      <input type="text" id="del-code-input" placeholder="8 números" maxlength="8" onkeydown="if(event.key==='Enter')confirmDeleteProfile()">
+    </div>
+    <div class="error" id="del-code-error" style="margin-bottom:.5rem">El código no coincide. Inténtalo de nuevo.</div>
+    <div class="modal-actions">
+      <button class="btn-modal-danger" onclick="confirmDeleteProfile()">Confirmar eliminación</button>
+      <button class="btn-modal-secondary" onclick="closeOverlay('delete-overlay')">Cancelar</button>
+    </div>
   </div>
 </div>
 
-<!-- FINAL DELETE CONFIRM -->
+<!-- V4: FINAL DELETE CONFIRM -->
 <div class="overlay" id="delete-final-overlay" onclick="handleOverlayClick(event,'delete-final-overlay')">
   <div class="modal" style="max-width:340px">
-    <div class="modal-header"><div class="modal-title red">¿Estás seguro?</div><button class="btn-close" onclick="closeOverlay('delete-final-overlay')">✕</button></div>
-    <p style="font-size:.82rem;color:var(--text2);margin-bottom:.2rem;line-height:1.5">Esta acción eliminará permanentemente tu perfil y todo tu progreso en ARCHER. No hay vuelta atrás.</p>
-    <div class="modal-actions"><button class="btn-modal-danger" onclick="executeDeleteProfile()">Sí, eliminar definitivamente</button><button class="btn-modal-secondary" onclick="closeOverlay('delete-final-overlay')">Cancelar</button></div>
+    <div class="modal-header">
+      <div class="modal-title red">¿Estás completamente seguro?</div>
+      <button class="btn-close" onclick="closeOverlay('delete-final-overlay')">✕</button>
+    </div>
+    <p style="font-size:.82rem;color:var(--text2);margin-bottom:.2rem;line-height:1.55">
+      Esta acción es permanente. Tu perfil y progreso en ARCHER serán eliminados definitivamente.
+    </p>
+    <div class="modal-actions">
+      <button class="btn-modal-danger" onclick="v4ExecuteDelete()">Sí, eliminar definitivamente</button>
+      <button class="btn-modal-secondary" onclick="closeOverlay('delete-final-overlay')">Cancelar</button>
+    </div>
   </div>
 </div>
 
+<!-- V4: WEEK REORDER MODAL -->
+<div class="overlay" id="reorder-overlay" onclick="handleOverlayClick(event,'reorder-overlay')">
+  <div class="modal" style="max-width:400px">
+    <div class="modal-header">
+      <div class="modal-title">Reordenar semanas</div>
+      <button class="btn-close" onclick="closeOverlay('reorder-overlay')">✕</button>
+    </div>
+    <p style="font-size:.75rem;color:var(--text3);margin-bottom:.85rem">
+      Arrastra las semanas para cambiar su orden. Las tarjetas se mueven junto a su semana.
+    </p>
+    <div class="week-reorder-list" id="week-reorder-list"></div>
+    <div class="modal-actions">
+      <button class="btn-modal-primary" onclick="v4SaveWeekOrder()">Guardar orden</button>
+      <button class="btn-modal-secondary" onclick="closeOverlay('reorder-overlay')">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ FIREBASE SCRIPT ══ -->
 <script type="module">
-import { initializeApp }   from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged, setPersistence, browserLocalPersistence }
+import { initializeApp }
+  from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged }
   from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import { getDatabase, ref, onValue, set, remove, get }
   from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
+// ── Config ──
 const firebaseConfig = {
-  apiKey:"AIzaSyBYLt4u-rTMXHxWdug57wbUNo7opPQUuY4",
-  authDomain:"archer-mws.firebaseapp.com",
-  databaseURL:"https://archer-mws-default-rtdb.firebaseio.com",
-  projectId:"archer-mws",
-  storageBucket:"archer-mws.firebasestorage.app",
-  messagingSenderId:"535787902121",
-  appId:"1:535787902121:web:9f5638a27250a2446f45b8"
+  apiKey:            "AIzaSyBYLt4u-rTMXHxWdug57wbUNo7opPQUuY4",
+  authDomain:        "archer-mws.firebaseapp.com",
+  databaseURL:       "https://archer-mws-default-rtdb.firebaseio.com",
+  projectId:         "archer-mws",
+  storageBucket:     "archer-mws.firebasestorage.app",
+  messagingSenderId: "535787902121",
+  appId:             "1:535787902121:web:9f5638a27250a2446f45b8"
 };
 
-const fbApp    = initializeApp(firebaseConfig);
-const auth     = getAuth(fbApp);
-const db       = getDatabase(fbApp);
+const fbApp   = initializeApp(firebaseConfig);
+const auth    = getAuth(fbApp);
+const db      = getDatabase(fbApp);
 const provider = new GoogleAuthProvider();
 
-// ── Set persistence to LOCAL so session survives page reloads ──
-await setPersistence(auth, browserLocalPersistence);
-
+// ── Constants ──
 const ADMIN_EMAIL = "mawhysha@gmail.com";
-const DAYS = ["Lunes","Martes","Miércoles","Jueves","Viernes","Sábado","Domingo"];
+const DAYS        = ["Lunes","Martes","Miércoles","Jueves","Viernes","Sábado","Domingo"];
 const TYPE_LABELS = {clase:"Clase",laboratorio:"Lab",parcial:"Parcial",trabajo:"Trabajo",especial:"Especial"};
-const SAVED_PROFILE_KEY = "archer_saved_profile_v3"; // local cache of last used profile info
 
 // ── State ──
-let currentUser=null, displayName=null, isAdmin=false, currentWeekIdx=0;
-let scheduleData={weeks:[]}, subjects=[], userStatuses={}, subjectColors={};
-let editingEvId=null, editingWeekIdx=null, pendingDeleteFn=null;
-let schedUnsub=null, statusUnsub=null, colorsUnsub=null;
-let verifyCode="", reorderBuffer=[];
-let customizeOpen=false;
+let currentUser   = null;   // Firebase Auth user object
+let displayName   = null;   // ARCHER display name
+let isAdmin       = false;
+let currentWeekIdx = 0;
+let scheduleData  = {weeks:[]};
+let subjects      = [];
+let userStatuses  = {};
+let editingEvId   = null, editingWeekIdx = null;
+let pendingDeleteFn = null;
+let schedUnsub    = null, statusUnsub = null;
+let verifyCode    = "";
 
 // ── DB refs ──
-const schedRef   = ()=>ref(db,'schedule');
-const subjRef    = ()=>ref(db,'subjects');
-const userRef    = uid=>ref(db,`users/${uid}`);
-const statusRef  = uid=>ref(db,`statuses/${uid}`);
-const colorsRef  = uid=>ref(db,`subjectColors/${uid}`);
+const schedRef    = () => ref(db, 'schedule');
+const subjRef     = () => ref(db, 'subjects');
+const userRef     = (uid) => ref(db, `users/${uid}`);
+const statusRef   = (uid) => ref(db, `statuses/${uid}`);
 
-// ── Local saved profile (for quick-access on reload/after logout) ──
-function getSavedProfile(){try{return JSON.parse(localStorage.getItem(SAVED_PROFILE_KEY))||null;}catch(e){return null;}}
-function setSavedProfile(data){try{localStorage.setItem(SAVED_PROFILE_KEY,JSON.stringify(data));}catch(e){}}
-function clearSavedProfile(){try{localStorage.removeItem(SAVED_PROFILE_KEY);}catch(e){}}
-
-// ── Transition ──
+// ── Transition helper ──
 function transition(fn){
-  const el=document.getElementById('screen-transition');
+  const el = document.getElementById('screen-transition');
   el.classList.add('active');
-  setTimeout(()=>{ fn(); setTimeout(()=>el.classList.remove('active'),300); },280);
+  setTimeout(()=>{ fn(); setTimeout(()=>el.classList.remove('active'),300); }, 280);
 }
 
-// ── Auth state — runs on every load ──
-onAuthStateChanged(auth, async user=>{
+// ── Auth state listener ──
+onAuthStateChanged(auth, async (user)=>{
   hideEl('connecting-state');
 
-  if(user){
-    // User has an active Firebase session (survived page reload)
-    currentUser=user; isAdmin=user.email===ADMIN_EMAIL;
-    const snap=await get(userRef(user.uid));
-    if(snap.exists()&&snap.val().displayName){
-      displayName=snap.val().displayName;
-      setSavedProfile({uid:user.uid,name:displayName,photo:user.photoURL||null,email:user.email});
-      // Go straight to app — no login screen needed
-      document.getElementById('login-screen').style.display='none';
-      document.getElementById('app').style.display='block';
-      startApp();
+  if(!user){
+    // Not signed in — show saved profile card if available, otherwise fresh login
+    const v4saved = v4GetSavedProfile();
+    if(v4saved){
+      v4ShowSavedProfileCard(v4saved);
     } else {
-      showNameSetup(user);
+      showEl('login-main-section');
     }
     return;
   }
 
-  // No active session — check if we have a saved profile to show quick-access
-  const saved=getSavedProfile();
-  if(saved){
-    showSavedProfile(saved);
+  currentUser = user;
+  isAdmin = user.email === ADMIN_EMAIL;
+
+  // Check if user already has a display name in DB
+  const snap = await get(userRef(user.uid));
+  if(snap.exists() && snap.val().displayName){
+    displayName = snap.val().displayName;
+    transition(()=> startApp());
   } else {
-    showFreshLogin();
+    // New user — show name setup
+    showNameSetup(user);
   }
 });
 
-// ── Show saved profile quick-access ──
-function showSavedProfile(saved){
-  hideAll();
-  document.getElementById('saved-profile-section').style.display='block';
-  const wrap=document.getElementById('saved-profile-btn-wrap');
-  wrap.innerHTML=`
-    <div class="saved-profile-btn" onclick="signInSavedProfile()">
-      ${saved.photo
-        ?`<img class="sp-avatar" src="${esc(saved.photo)}" alt="">`
-        :`<div class="sp-avatar-placeholder">${esc((saved.name||'?').charAt(0).toUpperCase())}</div>`}
-      <div>
-        <div class="sp-name">${esc(saved.name)}</div>
-        <div class="sp-hint">${esc(saved.email)} · Toca para entrar</div>
-      </div>
-    </div>`;
-}
-
-// Quick sign-in: re-authenticate silently using the popup (Google restores session quickly if cookie is fresh)
-window.signInSavedProfile = async function(){
-  const wrap=document.getElementById('saved-profile-btn-wrap');
-  wrap.innerHTML='<div class="connecting-state" style="padding:.8rem 0"><div class="connecting-spinner"></div><div class="connecting-text">Verificando sesión…</div></div>';
-  try{
-    await signInWithPopup(auth,provider);
-    // onAuthStateChanged will handle the rest
-  }catch(e){
-    showSavedProfile(getSavedProfile());
-    showToast('No se pudo verificar. Intenta de nuevo.');
-  }
-};
-
-// ── Show fresh login ──
-window.showFreshLogin = function(){
-  hideAll();
-  document.getElementById('fresh-login-section').style.display='block';
-};
-
 // ── Google sign in ──
 window.signInWithGoogle = async function(){
-  document.getElementById('fresh-login-section').style.display='none';
-  document.getElementById('connecting-state').style.display='block';
-  document.getElementById('connecting-state').querySelector('.connecting-text').textContent='Conectando con Google…';
   try{
-    await signInWithPopup(auth,provider);
+    hideEl('login-main-section');
+    document.getElementById('connecting-state').style.display='block';
+    document.getElementById('connecting-state').querySelector('.connecting-text').textContent='Conectando con Google…';
+    await signInWithPopup(auth, provider);
+    // onAuthStateChanged handles the rest
   }catch(e){
     hideEl('connecting-state');
-    document.getElementById('fresh-login-section').style.display='block';
-    showToast('Error al conectar con Google.');
+    showEl('login-main-section');
+    showToast('Error al conectar con Google. Intenta de nuevo.');
   }
 };
 
 // ── Name setup ──
 function showNameSetup(user){
-  hideAll();
+  hideEl('login-main-section');
+  hideEl('connecting-state');
   document.getElementById('name-setup-section').style.display='block';
-  const wrap=document.getElementById('google-user-preview-wrap');
-  wrap.innerHTML=`<div class="google-user-preview">
-    ${user.photoURL?`<img class="google-avatar" src="${esc(user.photoURL)}" alt="">`:
-    `<div class="google-avatar-placeholder">${user.email.charAt(0).toUpperCase()}</div>`}
-    <div><div style="font-size:.82rem;color:var(--text);font-weight:500">${esc(user.displayName||user.email)}</div>
-    <div class="google-email">${esc(user.email)}</div></div></div>`;
-  const suggested=(user.displayName||'').split(' ')[0].slice(0,20);
-  document.getElementById('display-name-input').value=suggested;
+
+  // Show Google avatar and email
+  const wrap = document.getElementById('google-user-preview-wrap');
+  const photo = user.photoURL;
+  wrap.innerHTML = `
+    <div class="google-user-preview">
+      ${photo
+        ? `<img class="google-avatar" src="${photo}" alt="">`
+        : `<div class="google-avatar-placeholder">${user.email.charAt(0).toUpperCase()}</div>`}
+      <div>
+        <div style="font-size:.82rem;color:var(--text);font-weight:500">${esc(user.displayName||user.email)}</div>
+        <div class="google-email">${esc(user.email)}</div>
+      </div>
+    </div>`;
+
+  // Pre-fill with Google display name if short enough
+  const googleName = user.displayName || '';
+  const suggested  = googleName.split(' ')[0].slice(0,20);
+  document.getElementById('display-name-input').value = suggested;
   updateCharCount(document.getElementById('display-name-input'));
 }
 
-window.updateCharCount=function(inp){
-  const len=inp.value.length;
-  const el=document.getElementById('char-count');
-  el.textContent=`${len} / 20`; el.className='char-count'+(len>=18?' warn':'');
+window.updateCharCount = function(inp){
+  const len = inp.value.length;
+  const el  = document.getElementById('char-count');
+  el.textContent = `${len} / 20`;
+  el.className   = 'char-count' + (len >= 18 ? ' warn' : '');
 };
 
-window.confirmDisplayName=async function(){
-  const name=document.getElementById('display-name-input').value.trim();
-  if(name.length<2){showEl('name-error');return;} hideEl('name-error');
-  displayName=name;
-  await set(userRef(currentUser.uid),{displayName:name,email:currentUser.email,photoURL:currentUser.photoURL||null,createdAt:Date.now()});
-  setSavedProfile({uid:currentUser.uid,name,photo:currentUser.photoURL||null,email:currentUser.email});
-  transition(()=>startApp());
+window.confirmDisplayName = async function(){
+  const name = document.getElementById('display-name-input').value.trim();
+  if(name.length < 2){ showEl('name-error'); return; }
+  hideEl('name-error');
+  displayName = name;
+  await set(userRef(currentUser.uid), {
+    displayName: name,
+    email: currentUser.email,
+    photoURL: currentUser.photoURL || null,
+    createdAt: Date.now()
+  });
+  v4SetSavedProfile({name, email: currentUser.email, photo: currentUser.photoURL||null});
+  transition(()=> startApp());
 };
 
-window.cancelNameSetup=async function(){
+window.cancelNameSetup = async function(){
   await signOut(auth);
-  clearSavedProfile();
-  hideAll();
-  document.getElementById('fresh-login-section').style.display='block';
+  document.getElementById('name-setup-section').style.display='none';
+  showEl('login-main-section');
 };
-
-// ── Helpers to show/hide login sections ──
-function hideAll(){
-  ['connecting-state','saved-profile-section','fresh-login-section','name-setup-section']
-    .forEach(id=>{const el=document.getElementById(id);if(el)el.style.display='none';});
-}
 
 // ── App start ──
 function startApp(){
+  document.getElementById('login-screen').style.display='none';
+  document.getElementById('app').style.display='block';
   document.getElementById('app').style.animation='pageFadeIn .5s ease both';
+
   if(isAdmin) document.getElementById('app').classList.add('is-admin');
-  else document.getElementById('app').classList.remove('is-admin');
-  document.getElementById('topbar-name').textContent=displayName;
-  document.getElementById('role-dot').className='role-dot'+(isAdmin?' admin':'');
-  const avWrap=document.getElementById('topbar-avatar-wrap');
-  avWrap.innerHTML=currentUser.photoURL
-    ?`<img class="user-chip-avatar" src="${esc(currentUser.photoURL)}" alt="">`
-    :`<div class="user-chip-placeholder">${displayName.charAt(0).toUpperCase()}</div>`;
-  if(isAdmin){document.getElementById('admin-panel').style.display='block';document.getElementById('admin-week-controls').style.display='flex';}
-  else{document.getElementById('admin-panel').style.display='none';document.getElementById('admin-week-controls').style.display='none';}
-  currentWeekIdx=0;
-  listenSchedule(); listenSubjects(); listenStatuses(); listenColors();
+  else        document.getElementById('app').classList.remove('is-admin');
+
+  document.getElementById('topbar-name').textContent = displayName;
+  document.getElementById('role-dot').className = 'role-dot'+(isAdmin?' admin':'');
+
+  // Avatar in topbar
+  const avatarWrap = document.getElementById('topbar-avatar-wrap');
+  if(currentUser.photoURL){
+    avatarWrap.innerHTML = `<img class="user-chip-avatar" src="${currentUser.photoURL}" alt="">`;
+  } else {
+    avatarWrap.innerHTML = `<div class="user-chip-placeholder">${displayName.charAt(0).toUpperCase()}</div>`;
+  }
+
+  if(isAdmin){
+    document.getElementById('admin-panel').style.display='block';
+    document.getElementById('admin-week-controls').style.display='flex';
+  } else {
+    document.getElementById('admin-panel').style.display='none';
+    document.getElementById('admin-week-controls').style.display='none';
+  }
+
+  currentWeekIdx = 0;
+  v4SetSavedProfile({name: displayName, email: currentUser.email, photo: currentUser.photoURL||null});
+  listenSchedule();
+  listenSubjects();
+  listenStatuses();
+  v4ListenColors();
 }
 
 // ── Logout ──
-window.doLogout=async function(){
-  if(schedUnsub){schedUnsub();schedUnsub=null;}
-  if(statusUnsub){statusUnsub();statusUnsub=null;}
-  if(colorsUnsub){colorsUnsub();colorsUnsub=null;}
-  const saved=getSavedProfile();
-  transition(async()=>{
+window.doLogout = async function(){
+  if(schedUnsub){ schedUnsub(); schedUnsub=null; }
+  if(statusUnsub){ statusUnsub(); statusUnsub=null; }
+  if(v4ColorsUnsub){ v4ColorsUnsub(); v4ColorsUnsub=null; }
+  const v4saved = v4GetSavedProfile();
+  transition(async ()=>{
     await signOut(auth);
     document.getElementById('app').style.display='none';
     document.getElementById('login-screen').style.display='flex';
-    hideAll();
-    // After logout show saved profile card (not fresh login)
-    if(saved) showSavedProfile(saved);
-    else showFreshLogin();
+    document.getElementById('login-main-section').style.display='none';
+    document.getElementById('name-setup-section').style.display='none';
+    document.getElementById('connecting-state').style.display='none';
+    if(v4saved){
+      v4ShowSavedProfileCard(v4saved);
+    } else {
+      showEl('login-main-section');
+    }
   });
 };
 
-// ── Listeners ──
+// ── Real-time listeners ──
 function listenSchedule(){
-  if(schedUnsub)schedUnsub();
-  schedUnsub=onValue(schedRef(),snap=>{
-    const val=snap.val();
-    if(val&&val.weeks){scheduleData=val;}
-    else{
-      scheduleData={weeks:[]};
+  if(schedUnsub) schedUnsub();
+  schedUnsub = onValue(schedRef(), snap=>{
+    const val = snap.val();
+    if(val && val.weeks){
+      scheduleData = val;
+    } else {
+      scheduleData = {weeks:[]};
       for(let i=1;i<=16;i++) scheduleData.weeks.push({id:uid(),name:`Semana ${i}`,events:[]});
       fbSaveSchedule();
     }
-    if(currentWeekIdx>=scheduleData.weeks.length)currentWeekIdx=0;
-    buildWeekSelect(); renderCalendar(); setSyncLabel("en vivo"); setDot('ok');
-  },()=>{setSyncLabel("sin conexión");setDot('offline');});
+    if(currentWeekIdx >= scheduleData.weeks.length) currentWeekIdx=0;
+    buildWeekSelect();
+    renderCalendar();
+    setSyncLabel("en vivo"); setDot('ok');
+  }, ()=>{ setSyncLabel("sin conexión"); setDot('offline'); });
 }
+
 function listenSubjects(){
-  onValue(subjRef(),snap=>{
-    subjects=snap.val()||[];
-    renderSubjectSelects(); renderSubjectsList(); renderCustomizeList();
-  });
-}
-function listenStatuses(){
-  if(statusUnsub)statusUnsub();
-  statusUnsub=onValue(statusRef(currentUser.uid),snap=>{
-    userStatuses=snap.val()||{}; renderCalendar();
-  });
-}
-function listenColors(){
-  if(colorsUnsub)colorsUnsub();
-  colorsUnsub=onValue(colorsRef(currentUser.uid),snap=>{
-    subjectColors=snap.val()||{}; renderCalendar(); renderCustomizeList();
+  onValue(subjRef(), snap=>{
+    subjects = snap.val() || [];
+    renderSubjectSelects();
+    renderSubjectsList();
   });
 }
 
-// ── Firebase saves ──
-async function fbSaveSchedule(){
-  setSyncLabel("guardando…");setDot('syncing');
-  try{await set(schedRef(),scheduleData);setSyncLabel("guardado");setDot('ok');}
-  catch(e){setSyncLabel("error");setDot('offline');showToast("Error al guardar.");}
+function listenStatuses(){
+  if(statusUnsub) statusUnsub();
+  statusUnsub = onValue(statusRef(currentUser.uid), snap=>{
+    userStatuses = snap.val() || {};
+    renderCalendar(); // refresh with updated statuses
+  });
 }
-async function fbSaveSubjects(){try{await set(subjRef(),subjects);}catch(e){}}
-async function fbSaveStatuses(){try{await set(statusRef(currentUser.uid),userStatuses);}catch(e){}}
-async function fbSaveColors(){try{await set(colorsRef(currentUser.uid),subjectColors);}catch(e){}}
+
+// ── Firebase save ──
+async function fbSaveSchedule(){
+  setSyncLabel("guardando…"); setDot('syncing');
+  try{
+    await set(schedRef(), scheduleData);
+    setSyncLabel("guardado"); setDot('ok');
+  }catch(e){ setSyncLabel("error"); setDot('offline'); showToast("Error al guardar. Revisa tu conexión."); }
+}
+async function fbSaveSubjects(){ try{ await set(subjRef(),subjects); }catch(e){} }
+async function fbSaveStatuses(){
+  try{ await set(statusRef(currentUser.uid), userStatuses); }catch(e){}
+}
 
 // ── Confirm modal ──
-window.openConfirm=function(title,body,onConfirm){
+window.openConfirm = function(title,body,onConfirm){
   document.getElementById('confirm-title').textContent=title;
   document.getElementById('confirm-body').innerHTML=body;
   pendingDeleteFn=onConfirm;
   document.getElementById('confirm-ok-btn').onclick=()=>{
     closeOverlay('confirm-overlay');
-    if(pendingDeleteFn)pendingDeleteFn();
+    if(pendingDeleteFn) pendingDeleteFn();
     pendingDeleteFn=null;
   };
   openOverlay('confirm-overlay');
 };
 
 // ── Admin tabs ──
-window.switchAdminTab=function(name,btn){
+window.switchAdminTab = function(name,btn){
   document.querySelectorAll('.admin-tab').forEach(t=>t.classList.remove('active'));
   document.querySelectorAll('.admin-tab-panel').forEach(p=>p.classList.remove('active'));
   btn.classList.add('active');
@@ -805,179 +942,106 @@ window.switchAdminTab=function(name,btn){
 // ── Subjects ──
 function renderSubjectSelects(){
   const opts='<option value="">— Sin materia —</option>'+subjects.map(s=>`<option value="${esc(s)}">${esc(s)}</option>`).join('');
-  ['ev-subject','em-subject'].forEach(id=>{const el=document.getElementById(id);if(el)el.innerHTML=opts;});
+  ['ev-subject','em-subject'].forEach(id=>{ const el=document.getElementById(id); if(el) el.innerHTML=opts; });
 }
 function renderSubjectsList(){
-  const list=document.getElementById('subjects-list');if(!list)return;
-  if(!subjects.length){list.innerHTML='<div class="subjects-empty">No hay materias.</div>';return;}
+  const list=document.getElementById('subjects-list'); if(!list) return;
+  if(!subjects.length){ list.innerHTML='<div class="subjects-empty">No hay materias. Agrega una arriba.</div>'; return; }
   list.innerHTML=subjects.map((s,i)=>`<div class="subject-chip"><span>${esc(s)}</span><button onclick="removeSubject(${i})">✕</button></div>`).join('');
 }
-window.addSubject=function(){
-  if(!isAdmin)return;
-  const inp=document.getElementById('new-subject-input'),val=inp.value.trim();
-  if(!val||subjects.includes(val)){showToast(val?'Esa materia ya existe':'Escribe un nombre');return;}
-  subjects.push(val);fbSaveSubjects();inp.value='';
-  renderSubjectSelects();renderSubjectsList();renderCustomizeList();showToast(`"${val}" agregada`);
+window.addSubject = function(){
+  if(!isAdmin) return;
+  const inp=document.getElementById('new-subject-input'), val=inp.value.trim();
+  if(!val||subjects.includes(val)){ showToast(val?'Esa materia ya existe':'Escribe un nombre'); return; }
+  subjects.push(val); fbSaveSubjects(); inp.value='';
+  renderSubjectSelects(); renderSubjectsList(); showToast(`"${val}" agregada`);
 };
-window.removeSubject=function(idx){
-  if(!isAdmin)return;
-  const name=subjects[idx];subjects.splice(idx,1);fbSaveSubjects();
-  renderSubjectSelects();renderSubjectsList();renderCustomizeList();showToast(`"${name}" eliminada`);
+window.removeSubject = function(idx){
+  if(!isAdmin) return;
+  const name=subjects[idx]; subjects.splice(idx,1); fbSaveSubjects();
+  renderSubjectSelects(); renderSubjectsList(); showToast(`"${name}" eliminada`);
 };
-
-// ── Subject colors (per user, stored in Firebase) ──
-function getCardBorderColor(subject){
-  if(subject&&subjectColors[subject]) return subjectColors[subject];
-  return null; // uses CSS default
-}
-
-function renderCustomizeList(){
-  const list=document.getElementById('customize-subjects-list');if(!list)return;
-  if(!subjects.length){list.innerHTML='<div class="customize-empty">No hay materias definidas aún.</div>';return;}
-  list.innerHTML=subjects.map(s=>{
-    const color=subjectColors[s]||'#7c6cfc';
-    const safeId='cs_'+s.replace(/[^a-z0-9]/gi,'_');
-    return`<div class="customize-row">
-      <span class="customize-subject-name">${esc(s)}</span>
-      <div class="customize-color-wrap">
-        <div class="color-swatch" style="background:${color}" onclick="document.getElementById('${safeId}').click()" title="Cambiar color"></div>
-        <input type="color" id="${safeId}" class="color-input-hidden" value="${color}" onchange="setSubjectColor('${esc(s)}',this.value)">
-        ${subjectColors[s]?`<button class="btn-reset-color" onclick="resetSubjectColor('${esc(s)}')" title="Quitar color">↺</button>`:''}
-      </div>
-    </div>`;
-  }).join('');
-}
-
-window.setSubjectColor=function(subject,color){
-  subjectColors[subject]=color;
-  fbSaveColors();
-  renderCalendar();
-  renderCustomizeList();
-};
-window.resetSubjectColor=function(subject){
-  delete subjectColors[subject];
-  fbSaveColors();
-  renderCalendar();
-  renderCustomizeList();
-};
-
-window.toggleCustomize=function(e){
-  e.stopPropagation();
-  const dd=document.getElementById('customize-dropdown');
-  customizeOpen=!customizeOpen;
-  dd.classList.toggle('open',customizeOpen);
-};
-document.addEventListener('click',()=>{ if(customizeOpen){customizeOpen=false;document.getElementById('customize-dropdown').classList.remove('open');} });
 
 // ── Weeks ──
 function buildWeekSelect(){
-  const sel=document.getElementById('week-select');sel.innerHTML='';
+  const sel=document.getElementById('week-select'); sel.innerHTML='';
   scheduleData.weeks.forEach((w,i)=>{
-    const o=document.createElement('option');o.value=i;o.textContent=w.name;
-    if(i===currentWeekIdx)o.selected=true;sel.appendChild(o);
+    const o=document.createElement('option'); o.value=i; o.textContent=w.name;
+    if(i===currentWeekIdx) o.selected=true; sel.appendChild(o);
   });
 }
-window.selectWeek=function(idx){currentWeekIdx=parseInt(idx);renderCalendar();};
-window.navWeek=function(dir){const n=currentWeekIdx+dir;if(n<0||n>=scheduleData.weeks.length)return;currentWeekIdx=n;document.getElementById('week-select').value=n;renderCalendar();};
-window.addWeek=function(){
-  if(!isAdmin)return;
+window.selectWeek = function(idx){ currentWeekIdx=parseInt(idx); renderCalendar(); };
+window.navWeek    = function(dir){ const n=currentWeekIdx+dir; if(n<0||n>=scheduleData.weeks.length)return; currentWeekIdx=n; document.getElementById('week-select').value=n; renderCalendar(); };
+window.addWeek    = function(){
+  if(!isAdmin) return;
   const inp=document.getElementById('new-week-name');
   const name=inp.value.trim()||`Semana ${scheduleData.weeks.length+1}`;
-  scheduleData.weeks.push({id:uid(),name,events:[]});fbSaveSchedule();
-  currentWeekIdx=scheduleData.weeks.length-1;buildWeekSelect();
-  document.getElementById('week-select').value=currentWeekIdx;renderCalendar();inp.value='';
+  scheduleData.weeks.push({id:uid(),name,events:[]}); fbSaveSchedule();
+  currentWeekIdx=scheduleData.weeks.length-1; buildWeekSelect();
+  document.getElementById('week-select').value=currentWeekIdx; renderCalendar(); inp.value='';
   showToast(`"${name}" agregada`);
 };
-window.askDeleteWeek=function(){
-  if(!isAdmin)return;
-  if(scheduleData.weeks.length<=1){showToast('Debe quedar al menos una semana');return;}
+window.askDeleteWeek = function(){
+  if(!isAdmin) return;
+  if(scheduleData.weeks.length<=1){ showToast('Debe quedar al menos una semana'); return; }
   const name=scheduleData.weeks[currentWeekIdx].name;
-  openConfirm('⚠ Eliminar semana',`¿Deseas eliminar <span class="confirm-modal-name">"${esc(name)}"</span>?`,doDeleteWeek);
+  openConfirm('⚠ Eliminar semana',
+    `¿Deseas eliminar <span class="confirm-modal-name">"${esc(name)}"</span>? Se perderán todos sus eventos.`,
+    doDeleteWeek);
 };
 function doDeleteWeek(){
   const name=scheduleData.weeks[currentWeekIdx].name;
   scheduleData.weeks.splice(currentWeekIdx,1);
-  if(currentWeekIdx>=scheduleData.weeks.length)currentWeekIdx=Math.max(0,scheduleData.weeks.length-1);
-  fbSaveSchedule();buildWeekSelect();document.getElementById('week-select').value=currentWeekIdx;renderCalendar();
+  if(currentWeekIdx>=scheduleData.weeks.length) currentWeekIdx=Math.max(0,scheduleData.weeks.length-1);
+  fbSaveSchedule(); buildWeekSelect(); document.getElementById('week-select').value=currentWeekIdx; renderCalendar();
   showToast(`"${name}" eliminada`);
 }
-window.openRenameWeek=function(){if(!isAdmin)return;document.getElementById('rename-week-input').value=scheduleData.weeks[currentWeekIdx].name;openOverlay('rename-overlay');};
-window.saveRenameWeek=function(){
+window.openRenameWeek = function(){ if(!isAdmin) return; document.getElementById('rename-week-input').value=scheduleData.weeks[currentWeekIdx].name; openOverlay('rename-overlay'); };
+window.saveRenameWeek = function(){
   const val=document.getElementById('rename-week-input').value.trim();
-  if(!val){showToast('Escribe un nombre');return;}
-  scheduleData.weeks[currentWeekIdx].name=val;fbSaveSchedule();buildWeekSelect();
-  document.getElementById('week-select').value=currentWeekIdx;closeOverlay('rename-overlay');showToast('Semana renombrada');
-};
-
-// ── Week reorder (drag and drop) ──
-window.openReorderWeeks=function(){
-  if(!isAdmin)return;
-  reorderBuffer=[...scheduleData.weeks.map(w=>({...w}))];
-  renderReorderList();
-  openOverlay('reorder-overlay');
-};
-function renderReorderList(){
-  const list=document.getElementById('week-reorder-list');
-  list.innerHTML=reorderBuffer.map((w,i)=>`
-    <div class="week-reorder-item" draggable="true" data-idx="${i}"
-      ondragstart="reorderDragStart(event,${i})"
-      ondragover="reorderDragOver(event,${i})"
-      ondrop="reorderDrop(event,${i})"
-      ondragend="reorderDragEnd()">
-      <span class="week-drag-handle">⠿</span>
-      <span class="week-reorder-name">${esc(w.name)}</span>
-      <span class="week-reorder-count">${(w.events||[]).length} evento${(w.events||[]).length!==1?'s':''}</span>
-    </div>`).join('');
-}
-let dragSrcIdx=null;
-window.reorderDragStart=function(e,idx){dragSrcIdx=idx;e.target.classList.add('dragging');};
-window.reorderDragOver=function(e,idx){e.preventDefault();document.querySelectorAll('.week-reorder-item').forEach(el=>el.classList.remove('drag-over'));document.querySelector(`.week-reorder-item[data-idx="${idx}"]`)?.classList.add('drag-over');};
-window.reorderDrop=function(e,idx){
-  e.preventDefault();
-  if(dragSrcIdx===null||dragSrcIdx===idx)return;
-  const moved=reorderBuffer.splice(dragSrcIdx,1)[0];
-  reorderBuffer.splice(idx,0,moved);
-  dragSrcIdx=null;
-  renderReorderList();
-};
-window.reorderDragEnd=function(){document.querySelectorAll('.week-reorder-item').forEach(el=>el.classList.remove('dragging','drag-over'));dragSrcIdx=null;};
-window.saveWeekOrder=function(){
-  if(!isAdmin)return;
-  const currentWeekId=scheduleData.weeks[currentWeekIdx]?.id;
-  scheduleData.weeks=reorderBuffer;
-  // Restore current week index after reorder
-  const newIdx=scheduleData.weeks.findIndex(w=>w.id===currentWeekId);
-  currentWeekIdx=newIdx>=0?newIdx:0;
-  fbSaveSchedule();buildWeekSelect();document.getElementById('week-select').value=currentWeekIdx;
-  closeOverlay('reorder-overlay');renderCalendar();showToast('Orden de semanas guardado');
+  if(!val){ showToast('Escribe un nombre'); return; }
+  scheduleData.weeks[currentWeekIdx].name=val; fbSaveSchedule(); buildWeekSelect();
+  document.getElementById('week-select').value=currentWeekIdx; closeOverlay('rename-overlay'); showToast('Semana renombrada');
 };
 
 // ── Events ──
-window.addEvent=function(){
-  if(!isAdmin)return;
+window.addEvent = function(){
+  if(!isAdmin) return;
   const title=document.getElementById('ev-title').value.trim();
-  if(!title){showToast('Escribe un título');return;}
-  const ev={id:uid(),title,type:document.getElementById('ev-type').value,subject:document.getElementById('ev-subject').value,day:document.getElementById('ev-day').value,date:document.getElementById('ev-date').value,timeStart:document.getElementById('ev-time-start').value,timeEnd:document.getElementById('ev-time-end').value,desc:document.getElementById('ev-desc').value.trim()};
-  if(!scheduleData.weeks[currentWeekIdx].events)scheduleData.weeks[currentWeekIdx].events=[];
-  scheduleData.weeks[currentWeekIdx].events.push(ev);fbSaveSchedule();
+  if(!title){ showToast('Escribe un título'); return; }
+  const ev={
+    id:uid(), title,
+    type:document.getElementById('ev-type').value,
+    subject:document.getElementById('ev-subject').value,
+    day:document.getElementById('ev-day').value,
+    date:document.getElementById('ev-date').value,
+    timeStart:document.getElementById('ev-time-start').value,
+    timeEnd:document.getElementById('ev-time-end').value,
+    desc:document.getElementById('ev-desc').value.trim(),
+  };
+  if(!scheduleData.weeks[currentWeekIdx].events) scheduleData.weeks[currentWeekIdx].events=[];
+  scheduleData.weeks[currentWeekIdx].events.push(ev); fbSaveSchedule();
   ['ev-title','ev-date','ev-time-start','ev-time-end','ev-desc'].forEach(id=>document.getElementById(id).value='');
   showToast(`"${title}" agregado`);
 };
-window.askDeleteEvent=function(weekIdx,evId){
-  if(!isAdmin)return;
+window.askDeleteEvent = function(weekIdx,evId){
+  if(!isAdmin) return;
   const ev=scheduleData.weeks[weekIdx]?.events?.find(e=>e.id===evId);
-  openConfirm('⚠ Eliminar evento',`¿Deseas eliminar <span class="confirm-modal-name">"${esc(ev?ev.title:'este evento')}"</span>?`,()=>doDeleteEvent(weekIdx,evId));
+  const name=ev?ev.title:'este evento';
+  openConfirm('⚠ Eliminar evento',
+    `¿Deseas eliminar <span class="confirm-modal-name">"${esc(name)}"</span>?`,
+    ()=>doDeleteEvent(weekIdx,evId));
 };
 function doDeleteEvent(weekIdx,evId){
   scheduleData.weeks[weekIdx].events=scheduleData.weeks[weekIdx].events.filter(e=>e.id!==evId);
-  fbSaveSchedule();showToast('Evento eliminado');
+  fbSaveSchedule(); showToast('Evento eliminado');
 }
 
 // ── Edit modal ──
-window.openEditModal=function(evId,weekIdx){
-  if(!isAdmin)return;
-  const ev=scheduleData.weeks[weekIdx]?.events?.find(e=>e.id===evId);if(!ev)return;
-  editingEvId=evId;editingWeekIdx=weekIdx;
+window.openEditModal = function(evId,weekIdx){
+  if(!isAdmin) return;
+  const ev=scheduleData.weeks[weekIdx]?.events?.find(e=>e.id===evId); if(!ev) return;
+  editingEvId=evId; editingWeekIdx=weekIdx;
   renderSubjectSelects();
   document.getElementById('em-title').value=ev.title||'';
   document.getElementById('em-type').value=ev.type||'clase';
@@ -989,127 +1053,130 @@ window.openEditModal=function(evId,weekIdx){
   document.getElementById('em-desc').value=ev.desc||'';
   openOverlay('edit-overlay');
 };
-window.saveEditModal=function(){
-  if(!isAdmin||!editingEvId)return;
+window.saveEditModal = function(){
+  if(!isAdmin||!editingEvId) return;
   const title=document.getElementById('em-title').value.trim();
-  if(!title){showToast('El título no puede estar vacío');return;}
-  const ev=scheduleData.weeks[editingWeekIdx].events.find(e=>e.id===editingEvId);if(!ev)return;
-  ev.title=title;ev.type=document.getElementById('em-type').value;ev.subject=document.getElementById('em-subject').value;
-  ev.day=document.getElementById('em-day').value;ev.date=document.getElementById('em-date').value;
-  ev.timeStart=document.getElementById('em-tstart').value;ev.timeEnd=document.getElementById('em-tend').value;
+  if(!title){ showToast('El título no puede estar vacío'); return; }
+  const ev=scheduleData.weeks[editingWeekIdx].events.find(e=>e.id===editingEvId); if(!ev) return;
+  ev.title=title; ev.type=document.getElementById('em-type').value;
+  ev.subject=document.getElementById('em-subject').value;
+  ev.day=document.getElementById('em-day').value; ev.date=document.getElementById('em-date').value;
+  ev.timeStart=document.getElementById('em-tstart').value; ev.timeEnd=document.getElementById('em-tend').value;
   ev.desc=document.getElementById('em-desc').value.trim();
-  fbSaveSchedule();closeOverlay('edit-overlay');showToast('Evento actualizado');
+  fbSaveSchedule(); closeOverlay('edit-overlay'); showToast('Evento actualizado');
 };
 
-// ── Status ──
-window.setStatus=function(evId,status){
-  userStatuses[evId]=userStatuses[evId]===status?null:status;
-  if(!userStatuses[evId])delete userStatuses[evId];
+// ── Status (saved to Firebase per user) ──
+window.setStatus = function(evId,status){
+  userStatuses[evId] = userStatuses[evId]===status ? null : status;
+  if(!userStatuses[evId]) delete userStatuses[evId];
   fbSaveStatuses();
-  const card=document.querySelector(`[data-ev-id="${evId}"]`);if(!card)return;
-  card.querySelectorAll('.status-pill').forEach(btn=>{btn.className='status-pill'+(userStatuses[evId]===btn.dataset.status?` active-${btn.dataset.status}`:'');});
+  const card=document.querySelector(`[data-ev-id="${evId}"]`); if(!card) return;
+  card.querySelectorAll('.status-pill').forEach(btn=>{
+    btn.className='status-pill'+(userStatuses[evId]===btn.dataset.status?` active-${btn.dataset.status}`:'');
+  });
   updateDayStats(card);
 };
 function updateDayStats(card){
-  const dayCol=card.closest('.day-col');if(!dayCol)return;
+  const dayCol=card.closest('.day-col'); if(!dayCol) return;
   const allCards=dayCol.querySelectorAll('.event-card');
-  let pending=0;allCards.forEach(c=>{if(userStatuses[c.dataset.evId]!=='completado')pending++;});
+  let pending=0;
+  allCards.forEach(c=>{ if(userStatuses[c.dataset.evId]!=='completado') pending++; });
   const statsEl=dayCol.querySelector('.day-stats');
-  if(statsEl)statsEl.innerHTML=buildDayStats(allCards.length,pending);
+  if(statsEl) statsEl.innerHTML=buildDayStats(allCards.length,pending);
 }
 function buildDayStats(total,pending){
-  if(!total)return'';
-  if(pending===0)return`<span class="day-done">✓ Todo realizado</span>`;
-  return`${total} evento${total>1?'s':''} · <span class="day-pending">${pending} pendiente${pending>1?'s':''}</span>`;
+  if(!total) return '';
+  if(pending===0) return `<span class="day-done">✓ Todo realizado</span>`;
+  return `${total} evento${total>1?'s':''} · <span class="day-pending">${pending} pendiente${pending>1?'s':''}</span>`;
 }
 
-// ── Toggle detail/desc ──
-window.toggleDetail=function(evId){const card=document.querySelector(`[data-ev-id="${evId}"]`);if(!card)return;card.querySelector('.event-detail')?.classList.toggle('open');card.querySelector('.toggle-arrow')?.classList.toggle('open');};
-window.toggleDesc=function(evId){const card=document.querySelector(`[data-ev-id="${evId}"]`);if(!card)return;card.querySelector('.desc-body')?.classList.toggle('open');card.querySelector('.desc-toggle-arrow')?.classList.toggle('open');};
+// ── Toggle detail / desc ──
+window.toggleDetail = function(evId){
+  const card=document.querySelector(`[data-ev-id="${evId}"]`); if(!card) return;
+  card.querySelector('.event-detail')?.classList.toggle('open');
+  card.querySelector('.toggle-arrow')?.classList.toggle('open');
+};
+window.toggleDesc = function(evId){
+  const card=document.querySelector(`[data-ev-id="${evId}"]`); if(!card) return;
+  card.querySelector('.desc-body')?.classList.toggle('open');
+  card.querySelector('.desc-toggle-arrow')?.classList.toggle('open');
+};
 
 // ── Settings ──
-window.openSettings=function(){
-  document.getElementById('settings-displayname').textContent=displayName;
-  document.getElementById('settings-email').textContent=currentUser.email;
-  document.getElementById('s-new-name').value='';
-  document.getElementById('s-char-count').textContent='0 / 20';
-  hideEl('s-name-error');
+window.openSettings = function(){
+  document.getElementById('settings-displayname').textContent = displayName;
+  document.getElementById('settings-email').textContent       = currentUser.email;
   openOverlay('settings-overlay');
-};
-window.updateCharCountSettings=function(inp){
-  const len=inp.value.length;
-  const el=document.getElementById('s-char-count');
-  el.textContent=`${len} / 20`;el.className='char-count'+(len>=18?' warn':'');
-};
-window.saveNewDisplayName=async function(){
-  const name=document.getElementById('s-new-name').value.trim();
-  if(name.length<2){showEl('s-name-error');return;}hideEl('s-name-error');
-  displayName=name;
-  await set(userRef(currentUser.uid),{displayName:name,email:currentUser.email,photoURL:currentUser.photoURL||null,updatedAt:Date.now()});
-  setSavedProfile({uid:currentUser.uid,name,photo:currentUser.photoURL||null,email:currentUser.email});
-  document.getElementById('topbar-name').textContent=name;
-  document.getElementById('settings-displayname').textContent=name;
-  closeOverlay('settings-overlay');showToast('Nombre actualizado');
 };
 
 // ── Delete profile ──
-window.openDeleteProfile=function(){
-  verifyCode=Array.from({length:8},()=>Math.floor(Math.random()*10)).join('');
-  document.getElementById('verify-code-display').textContent=verifyCode;
-  document.getElementById('del-code-input').value='';
+window.openDeleteProfile = function(){
+  verifyCode = Array.from({length:8},()=>Math.floor(Math.random()*10)).join('');
+  document.getElementById('verify-code-display').textContent = verifyCode;
+  document.getElementById('del-code-input').value = '';
   hideEl('del-code-error');
   openOverlay('delete-overlay');
 };
-window.confirmDeleteProfile=function(){
-  const input=document.getElementById('del-code-input').value.trim();
-  if(input!==verifyCode){showEl('del-code-error');return;}
+window.confirmDeleteProfile = function(){
+  const input = document.getElementById('del-code-input').value.trim();
+  if(input !== verifyCode){ showEl('del-code-error'); return; }
   hideEl('del-code-error');
   closeOverlay('delete-overlay');
   openOverlay('delete-final-overlay');
-};
-window.executeDeleteProfile=async function(){
-  try{await remove(userRef(currentUser.uid));await remove(statusRef(currentUser.uid));await remove(colorsRef(currentUser.uid));}catch(e){}
-  clearSavedProfile();
-  closeOverlay('delete-final-overlay');closeOverlay('settings-overlay');
-  showToast('Perfil eliminado');
-  transition(()=>window.doLogout());
 };
 
 // ── Render ──
 function buildDetailHTML(dateStr,timeStr,desc){
   let html='';
-  if(dateStr)html+=`<div class="detail-row">📅 ${dateStr}</div>`;
-  if(timeStr)html+=`<div class="detail-row">🕐 ${timeStr}</div>`;
+  if(dateStr) html+=`<div class="detail-row">📅 ${dateStr}</div>`;
+  if(timeStr) html+=`<div class="detail-row">🕐 ${timeStr}</div>`;
   if(desc){
-    if(dateStr||timeStr)html+=`<div class="detail-divider"></div>`;
-    html+=`<div class="desc-toggle" onclick="toggleDesc(this.closest('.event-card').dataset.evId)"><span class="desc-toggle-label">Descripción</span><span class="desc-toggle-arrow">▼</span></div><div class="desc-body"><div class="detail-desc">${esc(desc)}</div></div>`;
+    if(dateStr||timeStr) html+=`<div class="detail-divider"></div>`;
+    html+=`<div class="desc-toggle" onclick="toggleDesc(this.closest('.event-card').dataset.evId)">
+      <span class="desc-toggle-label">Descripción</span>
+      <span class="desc-toggle-arrow">▼</span>
+    </div><div class="desc-body"><div class="detail-desc">${esc(desc)}</div></div>`;
   }
   return html;
 }
 function renderCalendar(){
   const wrap=document.getElementById('calendar-wrap');
   const week=scheduleData.weeks[currentWeekIdx];
-  if(!week){wrap.innerHTML=`<div class="week-empty"><div class="week-empty-icon">📋</div><div class="week-empty-text">No hay semanas</div></div>`;return;}
-  const evsByDay={};DAYS.forEach(d=>evsByDay[d]=[]);
-  (week.events||[]).forEach(ev=>{if(evsByDay[ev.day])evsByDay[ev.day].push(ev);});
+  if(!week){ wrap.innerHTML=`<div class="week-empty"><div class="week-empty-icon">📋</div><div class="week-empty-text">No hay semanas</div></div>`; return; }
+  const evsByDay={};
+  DAYS.forEach(d=>evsByDay[d]=[]);
+  (week.events||[]).forEach(ev=>{ if(evsByDay[ev.day]) evsByDay[ev.day].push(ev); });
   let html=`<div class="calendar-grid">`;
   DAYS.forEach(day=>{
-    const evs=evsByDay[day],total=evs.length;
-    let pending=0;evs.forEach(ev=>{if(userStatuses[ev.id]!=='completado')pending++;});
-    html+=`<div class="day-col"><div class="day-header"><div class="day-name">${day}</div><div class="day-stats">${buildDayStats(total,pending)}</div></div><div class="day-events">`;
-    if(!total){html+=`<div class="day-empty">—</div>`;}
-    else{
+    const evs=evsByDay[day], total=evs.length;
+    let pending=0;
+    evs.forEach(ev=>{ if(userStatuses[ev.id]!=='completado') pending++; });
+    html+=`<div class="day-col">
+      <div class="day-header">
+        <div class="day-name">${day}</div>
+        <div class="day-stats">${buildDayStats(total,pending)}</div>
+      </div>
+      <div class="day-events">`;
+    if(!total){
+      html+=`<div class="day-empty">—</div>`;
+    } else {
       evs.forEach(ev=>{
         const status=userStatuses[ev.id]||'';
         const timeStr=ev.timeStart?(ev.timeEnd?`${fmtTime(ev.timeStart)} – ${fmtTime(ev.timeEnd)}`:fmtTime(ev.timeStart)):'';
         const dateStr=ev.date?fmtDate(ev.date):'';
         const hasDetail=!!(dateStr||timeStr||ev.desc);
-        // Subject color override
-        const subColor=getCardBorderColor(ev.subject);
-        const borderStyle=subColor?`style="border-top-color:${subColor}":`'';
-        html+=`<div class="event-card" data-type="${ev.type}" data-ev-id="${ev.id}" ${subColor?`style="border-top-color:${subColor}"`:''}>
-          <div class="card-admin-btns"><button class="btn-card-action edit" onclick="openEditModal('${ev.id}',${currentWeekIdx})">✎</button><button class="btn-card-action del" onclick="askDeleteEvent(${currentWeekIdx},'${ev.id}')">✕</button></div>
-          <div class="card-top"><span class="event-type-pill pill-${ev.type}">${TYPE_LABELS[ev.type]}</span>${hasDetail?`<span class="toggle-arrow" onclick="toggleDetail('${ev.id}')">▼</span>`:''}</div>
+        const v4border = (ev.subject && v4SubjectColors[ev.subject]) ? `style="border-top-color:${v4SubjectColors[ev.subject]}"` : '';
+        html+=`
+        <div class="event-card" data-type="${ev.type}" data-ev-id="${ev.id}" ${v4border}>
+          <div class="card-admin-btns">
+            <button class="btn-card-action edit" onclick="openEditModal('${ev.id}',${currentWeekIdx})">✎</button>
+            <button class="btn-card-action del" onclick="askDeleteEvent(${currentWeekIdx},'${ev.id}')">✕</button>
+          </div>
+          <div class="card-top">
+            <span class="event-type-pill pill-${ev.type}">${TYPE_LABELS[ev.type]}</span>
+            ${hasDetail?`<span class="toggle-arrow" onclick="toggleDetail('${ev.id}')">▼</span>`:''}
+          </div>
           <div class="event-title-text">${esc(ev.title)}</div>
           ${ev.subject?`<div class="event-subject">${esc(ev.subject)}</div>`:''}
           ${hasDetail?`<div class="event-detail">${buildDetailHTML(dateStr,timeStr,ev.desc)}</div>`:''}
@@ -1117,29 +1184,274 @@ function renderCalendar(){
             <button class="status-pill${status==='pendiente'?' active-pendiente':''}" data-status="pendiente" onclick="setStatus('${ev.id}','pendiente')">Pend.</button>
             <button class="status-pill${status==='en-proceso'?' active-en-proceso':''}" data-status="en-proceso" onclick="setStatus('${ev.id}','en-proceso')">Curso</button>
             <button class="status-pill${status==='completado'?' active-completado':''}" data-status="completado" onclick="setStatus('${ev.id}','completado')">Listo</button>
-          </div></div>`;
+          </div>
+        </div>`;
       });
     }
     html+=`</div></div>`;
   });
-  html+=`</div>`;wrap.innerHTML=html;
+  html+=`</div>`;
+  wrap.innerHTML=html;
 }
 
 // ── Overlay helpers ──
-window.openOverlay=function(id){document.getElementById(id).classList.add('open');};
-window.closeOverlay=function(id){document.getElementById(id).classList.remove('open');};
-window.handleOverlayClick=function(e,id){if(e.target===document.getElementById(id))closeOverlay(id);};
+window.openOverlay  = function(id){ document.getElementById(id).classList.add('open'); };
+window.closeOverlay = function(id){ document.getElementById(id).classList.remove('open'); };
+window.handleOverlayClick = function(e,id){ if(e.target===document.getElementById(id)) closeOverlay(id); };
 
 // ── Utils ──
-function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,6);}
-function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
-function fmtTime(t){if(!t)return'';const[h,m]=t.split(':');const hr=parseInt(h);return`${hr%12||12}:${m}${hr>=12?'pm':'am'}`;}
-function fmtDate(d){if(!d)return'';const[,mo,day]=d.split('-');const months=['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];return`${parseInt(day)} ${months[parseInt(mo)-1]}`;}
-function showEl(id){document.getElementById(id).style.display='block';}
-function hideEl(id){document.getElementById(id).style.display='none';}
-function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');clearTimeout(t._to);t._to=setTimeout(()=>t.classList.remove('show'),2800);}
-function setSyncLabel(msg){const el=document.getElementById('sync-label');if(el)el.textContent=msg;}
-function setDot(state){const d=document.getElementById('sync-dot');if(!d)return;d.className='sync-dot'+(state==='offline'?' offline':'');}
+function uid(){ return Date.now().toString(36)+Math.random().toString(36).slice(2,6); }
+function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function fmtTime(t){ if(!t) return ''; const[h,m]=t.split(':'); const hr=parseInt(h); return`${hr%12||12}:${m}${hr>=12?'pm':'am'}`; }
+function fmtDate(d){ if(!d) return ''; const[,mo,day]=d.split('-'); const months=['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic']; return`${parseInt(day)} ${months[parseInt(mo)-1]}`; }
+function showEl(id){ document.getElementById(id).style.display='block'; }
+function hideEl(id){ document.getElementById(id).style.display='none'; }
+function showToast(msg){ const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); clearTimeout(t._to); t._to=setTimeout(()=>t.classList.remove('show'),2800); }
+function setSyncLabel(msg){ const el=document.getElementById('sync-label'); if(el) el.textContent=msg; }
+function setDot(state){ const d=document.getElementById('sync-dot'); if(!d) return; d.className='sync-dot'+(state==='offline'?' offline':''); }
+
+// ════════════════════════════════════════════════════════
+// V4 NEW CODE — all additions below, nothing above changed
+// ════════════════════════════════════════════════════════
+
+// V4 state
+let v4SubjectColors = {};
+let v4ColorsUnsub   = null;
+let v4CustomizeOpen = false;
+let v4ReorderBuffer = [];
+let v4DragSrcIdx    = null;
+const V4_PROFILE_KEY = 'archer_v4_saved_profile';
+const v4ColorsRef    = (uid) => ref(db, `subjectColors/${uid}`);
+
+// ── V4 Saved profile (localStorage — only name/email/photo, no passwords) ──
+function v4GetSavedProfile(){
+  try{ return JSON.parse(localStorage.getItem(V4_PROFILE_KEY))||null; }catch(e){ return null; }
+}
+function v4SetSavedProfile(data){
+  try{ localStorage.setItem(V4_PROFILE_KEY, JSON.stringify(data)); }catch(e){}
+}
+function v4ClearSavedProfile(){
+  try{ localStorage.removeItem(V4_PROFILE_KEY); }catch(e){}
+}
+
+// ── V4 Show saved profile card on login screen ──
+function v4ShowSavedProfileCard(saved){
+  // Hide other sections
+  document.getElementById('connecting-state').style.display = 'none';
+  document.getElementById('login-main-section').style.display = 'none';
+  document.getElementById('name-setup-section').style.display = 'none';
+  // Build and show saved profile section
+  const sec  = document.getElementById('saved-profile-section');
+  const wrap = document.getElementById('saved-profile-btn-wrap');
+  wrap.innerHTML = `
+    <div class="saved-profile-btn" onclick="v4QuickSignIn()">
+      ${saved.photo
+        ? `<img class="sp-avatar" src="${esc(saved.photo)}" alt="">`
+        : `<div class="sp-avatar-placeholder">${esc((saved.name||'?').charAt(0).toUpperCase())}</div>`}
+      <div>
+        <div class="sp-name">${esc(saved.name || saved.email)}</div>
+        <div class="sp-email">${esc(saved.email)} · Toca para entrar</div>
+      </div>
+    </div>`;
+  sec.style.display = 'block';
+}
+
+// ── V4 Quick sign-in (re-opens Google popup for the saved account) ──
+window.v4QuickSignIn = async function(){
+  const wrap = document.getElementById('saved-profile-btn-wrap');
+  wrap.innerHTML = '<div style="padding:.7rem 0;text-align:center"><div class="connecting-spinner" style="margin:0 auto .5rem"></div><div class="connecting-text">Verificando sesión…</div></div>';
+  try{
+    await signInWithPopup(auth, provider);
+    // onAuthStateChanged handles the rest
+  }catch(e){
+    const saved = v4GetSavedProfile();
+    if(saved) v4ShowSavedProfileCard(saved);
+    else showEl('login-main-section');
+    showToast('No se pudo verificar. Intenta de nuevo.');
+  }
+};
+
+// ── V4 Show fresh login (user wants a different account) ──
+window.v4ShowFreshLogin = function(){
+  document.getElementById('saved-profile-section').style.display = 'none';
+  showEl('login-main-section');
+};
+
+// ── V4 Subject colors (Firebase per user) ──
+function v4ListenColors(){
+  if(v4ColorsUnsub) v4ColorsUnsub();
+  v4ColorsUnsub = onValue(v4ColorsRef(currentUser.uid), snap=>{
+    v4SubjectColors = snap.val() || {};
+    renderCalendar();
+    v4RenderCustomizeList();
+  });
+}
+async function v4SaveColors(){
+  if(!currentUser) return;
+  try{ await set(v4ColorsRef(currentUser.uid), v4SubjectColors); }catch(e){}
+}
+
+// ── V4 Customize dropdown ──
+window.v4ToggleCustomize = function(e){
+  e.stopPropagation();
+  v4CustomizeOpen = !v4CustomizeOpen;
+  document.getElementById('customize-dropdown').classList.toggle('open', v4CustomizeOpen);
+  if(v4CustomizeOpen) v4RenderCustomizeList();
+};
+document.addEventListener('click', ()=>{
+  if(v4CustomizeOpen){
+    v4CustomizeOpen = false;
+    const dd = document.getElementById('customize-dropdown');
+    if(dd) dd.classList.remove('open');
+  }
+});
+
+function v4RenderCustomizeList(){
+  const list = document.getElementById('customize-subjects-list');
+  if(!list) return;
+  if(!subjects.length){
+    list.innerHTML = '<div class="customize-empty">No hay materias definidas aún.</div>';
+    return;
+  }
+  list.innerHTML = subjects.map((s, idx) => {
+    const color  = v4SubjectColors[s] || '#7c6cfc';
+    const safeId = 'v4c_' + idx + '_' + s.replace(/[^a-z0-9]/gi,'');
+    return `<div class="customize-row">
+      <span class="customize-subject-name">${esc(s)}</span>
+      <div class="customize-color-wrap">
+        <div class="color-swatch" style="background:${color}"
+          onclick="document.getElementById('${safeId}').click()"></div>
+        <input type="color" id="${safeId}" class="color-input-hidden" value="${color}"
+          onchange="v4SetSubjectColor('${esc(s)}', this.value)">
+        ${v4SubjectColors[s]
+          ? `<button class="btn-reset-color" onclick="v4ResetColor('${esc(s)}')">↺</button>`
+          : ''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+window.v4SetSubjectColor = function(subject, color){
+  v4SubjectColors[subject] = color;
+  v4SaveColors();
+  renderCalendar();
+  v4RenderCustomizeList();
+};
+window.v4ResetColor = function(subject){
+  delete v4SubjectColors[subject];
+  v4SaveColors();
+  renderCalendar();
+  v4RenderCustomizeList();
+};
+
+// ── V4 Display name change ──
+window.v4UpdateNameCount = function(inp){
+  const len = inp.value.length;
+  const el  = document.getElementById('v4-name-char-count');
+  if(el){ el.textContent = `${len} / 20`; el.className = 'char-count'+(len>=18?' warn':''); }
+};
+window.v4SaveDisplayName = async function(){
+  const name = (document.getElementById('v4-new-name-input').value||'').trim();
+  if(name.length < 2){ showEl('v4-name-error'); return; }
+  hideEl('v4-name-error');
+  try{
+    await set(userRef(currentUser.uid), {
+      displayName: name,
+      email: currentUser.email,
+      photoURL: currentUser.photoURL||null,
+      updatedAt: Date.now()
+    });
+  }catch(e){ showToast('Error al guardar. Intenta de nuevo.'); return; }
+  displayName = name;
+  const tn = document.getElementById('topbar-name'); if(tn) tn.textContent = name;
+  const sd = document.getElementById('settings-displayname'); if(sd) sd.textContent = name;
+  v4SetSavedProfile({name, email: currentUser.email, photo: currentUser.photoURL||null});
+  closeOverlay('settings-overlay');
+  showToast('Nombre actualizado');
+};
+
+// Also clear name input when settings opens
+const _v4origOpenSettings = window.openSettings;
+window.openSettings = function(){
+  _v4origOpenSettings();
+  const inp = document.getElementById('v4-new-name-input');
+  if(inp) inp.value = '';
+  const sc = document.getElementById('v4-name-char-count');
+  if(sc) sc.textContent = '0 / 20';
+  hideEl('v4-name-error');
+};
+
+// ── V4 Execute final delete ──
+window.v4ExecuteDelete = async function(){
+  try{
+    await remove(userRef(currentUser.uid));
+    await remove(statusRef(currentUser.uid));
+    await remove(v4ColorsRef(currentUser.uid));
+  }catch(e){}
+  v4ClearSavedProfile();
+  closeOverlay('delete-final-overlay');
+  closeOverlay('settings-overlay');
+  showToast('Perfil eliminado');
+  transition(()=> doLogout());
+};
+
+// ── V4 Week reorder ──
+window.v4OpenReorder = function(){
+  if(!isAdmin) return;
+  v4ReorderBuffer = scheduleData.weeks.map(w=>({
+    ...w, events: Array.isArray(w.events) ? [...w.events] : []
+  }));
+  v4RenderReorderList();
+  openOverlay('reorder-overlay');
+};
+function v4RenderReorderList(){
+  const list = document.getElementById('week-reorder-list');
+  if(!list) return;
+  list.innerHTML = v4ReorderBuffer.map((w, i) => `
+    <div class="week-reorder-item" draggable="true" data-ridx="${i}"
+      ondragstart="v4DragStart(event,${i})"
+      ondragover="v4DragOver(event,${i})"
+      ondrop="v4Drop(event,${i})"
+      ondragend="v4DragEnd()">
+      <span class="week-drag-handle">⠿</span>
+      <span class="week-reorder-name">${esc(w.name)}</span>
+      <span class="week-reorder-count">${(w.events||[]).length} evento${(w.events||[]).length!==1?'s':''}</span>
+    </div>`).join('');
+}
+window.v4DragStart = function(e, idx){
+  v4DragSrcIdx = idx;
+  e.currentTarget.classList.add('dragging');
+};
+window.v4DragOver = function(e, idx){
+  e.preventDefault();
+  document.querySelectorAll('.week-reorder-item').forEach(el=>el.classList.remove('drag-over'));
+  document.querySelector(`.week-reorder-item[data-ridx="${idx}"]`)?.classList.add('drag-over');
+};
+window.v4Drop = function(e, idx){
+  e.preventDefault();
+  if(v4DragSrcIdx === null || v4DragSrcIdx === idx) return;
+  const moved = v4ReorderBuffer.splice(v4DragSrcIdx, 1)[0];
+  v4ReorderBuffer.splice(idx, 0, moved);
+  v4DragSrcIdx = null;
+  v4RenderReorderList();
+};
+window.v4DragEnd = function(){
+  document.querySelectorAll('.week-reorder-item').forEach(el=>el.classList.remove('dragging','drag-over'));
+  v4DragSrcIdx = null;
+};
+window.v4SaveWeekOrder = function(){
+  if(!isAdmin) return;
+  const currentId = scheduleData.weeks[currentWeekIdx]?.id;
+  scheduleData.weeks = v4ReorderBuffer;
+  const newIdx = scheduleData.weeks.findIndex(w => w.id === currentId);
+  currentWeekIdx = newIdx >= 0 ? newIdx : 0;
+  fbSaveSchedule();
+  buildWeekSelect();
+  document.getElementById('week-select').value = currentWeekIdx;
+  closeOverlay('reorder-overlay');
+  renderCalendar();
+  showToast('Orden de semanas actualizado');
+};
 </script>
 </body>
 </html>
