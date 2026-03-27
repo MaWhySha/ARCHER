@@ -185,22 +185,32 @@ select:focus{border-color:var(--accent);}
 
 /* ══ CALENDAR ══ */
 .calendar-wrap{
-  overflow-x:auto;padding:.9rem 1rem;
+  overflow-x:auto;padding:.9rem 1rem 2rem;
   min-height:calc(100vh - 160px);
-  padding-bottom:2rem;
-  /* Ensure the right border of last column is always visible */
   box-sizing:border-box;
+}
+/* Wrapper that provides the outer border via outline — never clipped by overflow */
+.calendar-grid-outer{
+  display:inline-block;
+  min-width:840px;
+  width:100%;
+  outline:1px solid var(--border);
+  outline-offset:0;
 }
 .calendar-grid{
   display:grid;
   grid-template-columns:repeat(7,minmax(152px,1fr));
   gap:0;
-  background:var(--bg);
-  border-top:1px solid var(--border);
-  border-left:1px solid var(--border);
-  min-width:840px;
+  width:100%;
 }
-.day-col{background:var(--surface);display:flex;flex-direction:column;border-right:1px solid var(--border);border-bottom:1px solid var(--border);}
+.day-col{
+  background:var(--surface);display:flex;flex-direction:column;
+  border-right:1px solid var(--border);
+  border-bottom:1px solid var(--border);
+}
+/* Remove right border on last column — outer outline covers it */
+.day-col:last-child{border-right:none;}
+/* Remove bottom border on last row — but since all 7 are in one row, only need last child tweak */
 .day-header{padding:.6rem .7rem .5rem;background:var(--surface2);border-bottom:1px solid var(--border);position:sticky;top:54px;z-index:5;}
 .day-name{font-family:'Syne',sans-serif;font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--text2);}
 .day-stats{font-size:.6rem;color:var(--text3);margin-top:.1rem;line-height:1.4;}
@@ -423,10 +433,7 @@ select:focus{border-color:var(--accent);}
   .form-grid-3x2{grid-template-columns:1fr 1fr;}
   .topbar{height:auto;padding:.5rem .8rem;}
   .week-bar{padding:.55rem .8rem;}
-  /* Extra right padding so last column border always visible on mobile */
-  .calendar-wrap{padding:.65rem 1rem 2rem;}
-  /* Ensure inner grid container has right margin to show last border */
-  .calendar-wrap > .calendar-grid{margin-right:1px;}
+  .calendar-wrap{padding:.65rem .8rem 2rem;}
   .admin-panel{padding:.85rem .8rem;}
   .login-card{padding:1.8rem 1.5rem;}
   .day-events{padding:4.5rem .5rem .6rem;}
@@ -1230,7 +1237,7 @@ function renderCalendar(){
   const evsByDay={};
   DAYS.forEach(d=>evsByDay[d]=[]);
   (week.events||[]).forEach(ev=>{ if(evsByDay[ev.day]) evsByDay[ev.day].push(ev); });
-  let html=`<div class="calendar-grid">`;
+  let html=`<div class="calendar-grid-outer"><div class="calendar-grid">`;
   DAYS.forEach(day=>{
     const evs=evsByDay[day], total=evs.length;
     let pending=0;
@@ -1273,7 +1280,7 @@ function renderCalendar(){
     }
     html+=`</div></div>`;
   });
-  html+=`</div>`;
+  html+=`</div></div>`;
   wrap.innerHTML=html;
 }
 
@@ -1301,6 +1308,7 @@ function setDot(state){ const d=document.getElementById('sync-dot'); if(!d) retu
 let v4SubjectColors = {};
 let v4ColorsUnsub   = null;
 let v4CustomizeOpen = false;
+let v4PreviewActive = false;  // true while user is dragging color picker
 let v4ReorderBuffer = [];
 let v4DragSrcIdx    = null;
 const V4_PROFILE_KEY = 'archer_v4_saved_profile';
@@ -1391,13 +1399,17 @@ window.v4ShowFreshLogin = function(){
   showEl('login-main-section');
 };
 
-// ── V4 Subject colors (Firebase per user) ──
+// ── V4 Subject colors (Firebase per user — real-time sync across all devices) ──
 function v4ListenColors(){
   if(v4ColorsUnsub) v4ColorsUnsub();
   v4ColorsUnsub = onValue(v4ColorsRef(currentUser.uid), snap=>{
-    v4SubjectColors = snap.val() || {};
-    renderCalendar();
-    v4RenderCustomizeList();
+    // Only update from Firebase if NOT currently mid-preview (user dragging picker)
+    if(!v4PreviewActive){
+      v4SubjectColors = snap.val() || {};
+      renderCalendar();
+      // Refresh customize list if modal is open
+      if(v4CustomizeOpen) v4RenderCustomizeList();
+    }
   });
 }
 async function v4SaveColors(){
@@ -1447,23 +1459,24 @@ function v4RenderCustomizeList(){
   }).join('');
 }
 
-// Preview color live while dragging (no Firebase save, no re-render)
+// Preview color live while dragging picker (local only — no Firebase write yet)
 window.v4PreviewColor = function(subject, safeId, color){
-  // Update swatch visually
+  v4PreviewActive = true;
   const sw = document.getElementById('swatch_' + safeId);
   if(sw) sw.style.background = color;
-  // Update cards live
   v4SubjectColors[subject] = color;
   renderCalendar();
 };
 
 window.v4SetSubjectColor = function(subject, color){
+  v4PreviewActive = false;  // picker released — allow Firebase listener again
   v4SubjectColors[subject] = color;
-  v4SaveColors();       // save to Firebase
-  renderCalendar();     // update card borders
-  v4RenderCustomizeList(); // refresh list (shows ↺ reset button)
+  v4SaveColors();           // save to Firebase → syncs to ALL devices with same account
+  renderCalendar();
+  v4RenderCustomizeList();
 };
 window.v4ResetColor = function(subject){
+  v4PreviewActive = false;
   delete v4SubjectColors[subject];
   v4SaveColors();
   renderCalendar();
