@@ -185,24 +185,22 @@ select:focus{border-color:var(--accent);}
 
 /* ══ CALENDAR ══ */
 .calendar-wrap{
-  overflow-x:auto;padding:.9rem 1rem 2rem;
+  overflow-x:auto;
+  /* Padding lateral 0 para que el grid ocupe todo el ancho y el outline no quede cortado */
+  padding:.9rem 0 2rem;
   min-height:calc(100vh - 160px);
-  box-sizing:border-box;
 }
+/* Border fix: outline no se corta con overflow:auto a diferencia de border */
 .calendar-grid{
   display:grid;
   grid-template-columns:repeat(7,minmax(152px,1fr));
-  gap:0;
-  width:max-content;
+  gap:1px;
+  background:var(--border);
   min-width:840px;
-  /* box-shadow draws the outer border — never clipped, works at any scroll position */
-  box-shadow:0 0 0 1px var(--border);
+  outline:1px solid var(--border);
+  margin:0 1rem; /* margen lateral para que el outline sea visible en todos los lados */
 }
-.day-col{
-  background:var(--surface);display:flex;flex-direction:column;
-  /* Right + bottom inner borders for the grid lines */
-  box-shadow:inset -1px -1px 0 0 var(--border);
-}
+.day-col{background:var(--surface);display:flex;flex-direction:column;}
 .day-header{padding:.6rem .7rem .5rem;background:var(--surface2);border-bottom:1px solid var(--border);position:sticky;top:54px;z-index:5;}
 .day-name{font-family:'Syne',sans-serif;font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--text2);}
 .day-stats{font-size:.6rem;color:var(--text3);margin-top:.1rem;line-height:1.4;}
@@ -318,97 +316,60 @@ select:focus{border-color:var(--accent);}
 .btn-switch-account{width:100%;padding:.58rem;background:transparent;border:1px solid var(--border2);color:var(--text3);font-family:'Instrument Sans',sans-serif;font-size:.75rem;cursor:pointer;border-radius:1px;transition:all .15s;margin-top:.5rem;}
 .btn-switch-account:hover{border-color:var(--text2);color:var(--text2);}
 
-/* ── V4: Customize button ── */
-.customize-btn{
-  padding:.3rem .65rem;background:transparent;border:1px solid var(--border2);
-  color:var(--text2);font-size:.68rem;cursor:pointer;border-radius:1px;
-  transition:all .15s;font-family:'Instrument Sans',sans-serif;white-space:nowrap;
-}
+/* ── V4: Customize — botón en topbar ── */
+.customize-panel-wrap{position:relative;}
+.customize-btn{padding:.3rem .65rem;background:transparent;border:1px solid var(--border2);color:var(--text2);font-size:.68rem;cursor:pointer;border-radius:1px;transition:all .15s;font-family:'Instrument Sans',sans-serif;white-space:nowrap;}
 .customize-btn:hover{border-color:var(--accent);color:var(--accent);}
-
-/* ── V4: Customize modal (centered overlay, works on all screen sizes) ── */
-.customize-overlay{
-  position:fixed;inset:0;background:rgba(0,0,0,.72);
-  z-index:600;display:none;
-  align-items:center;justify-content:center;
-  padding:1rem;
-  box-sizing:border-box;
-}
-.customize-overlay.open{display:flex;}
+/* Modal overlay — funciona igual en móvil y PC */
 .customize-modal{
   background:var(--surface);border:1px solid var(--border2);
-  width:100%;max-width:400px;
-  max-height:min(80vh, 520px);
-  display:flex;flex-direction:column;
-  box-shadow:0 24px 64px rgba(0,0,0,.7);
-  border-radius:2px;
-  animation:scaleIn .22s cubic-bezier(.16,1,.3,1) both;
-  overflow:hidden;
+  width:100%;max-width:420px;
+  /* Bottom sheet on mobile, centered modal on desktop */
+  max-height:70vh;display:flex;flex-direction:column;
+  box-shadow:0 20px 60px rgba(0,0,0,.6);
+  border-radius:8px 8px 0 0;
+  animation:scaleIn .2s cubic-bezier(.16,1,.3,1) both;
 }
-.customize-modal-header{
-  display:flex;align-items:center;justify-content:space-between;
-  padding:.75rem 1rem .55rem;
+.customize-header{
+  padding:.8rem 1rem .55rem;font-family:'Syne',sans-serif;font-size:.68rem;
+  font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--text3);
   border-bottom:1px solid var(--border);
-  flex-shrink:0;
-  background:var(--surface);
+  display:flex;align-items:center;justify-content:space-between;flex-shrink:0;
 }
-.customize-modal-title{
-  font-family:'Syne',sans-serif;font-size:.7rem;font-weight:700;
-  text-transform:uppercase;letter-spacing:.1em;color:var(--accent);
+.customize-close{
+  width:28px;height:28px;background:transparent;border:none;color:var(--text3);
+  font-size:.9rem;cursor:pointer;display:flex;align-items:center;justify-content:center;
+  border-radius:50%;transition:all .12s;
 }
-.customize-modal-body{
-  overflow-y:auto;flex:1;
-  /* smooth scroll on iOS */
-  -webkit-overflow-scrolling:touch;
-}
-.customize-row{
-  display:flex;align-items:center;justify-content:space-between;
-  padding:.6rem 1rem;gap:.75rem;
-  border-bottom:1px solid var(--border);
-  min-height:48px;
-}
+.customize-close:hover{color:var(--red);background:var(--red-soft);}
+.customize-body{overflow-y:auto;flex:1;}
+.customize-row{display:flex;align-items:center;justify-content:space-between;padding:.65rem 1rem;gap:.7rem;border-bottom:1px solid var(--border);}
 .customize-row:last-child{border-bottom:none;}
-.customize-subject-name{
-  font-size:.82rem;color:var(--text);flex:1;
-  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
-}
-.customize-color-wrap{display:flex;align-items:center;gap:.6rem;flex-shrink:0;}
-/* The label wraps the swatch + hidden input — clicking label triggers input */
-.color-swatch-label{
-  display:inline-flex;align-items:center;cursor:pointer;
-  position:relative;
+.customize-subject-name{font-size:.82rem;color:var(--text);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.customize-color-wrap{display:flex;align-items:center;gap:.5rem;flex-shrink:0;}
+/* Color swatch — larger touch target using label wrapper */
+.color-swatch-wrap{
+  position:relative;width:36px;height:36px;
+  flex-shrink:0;display:block;cursor:pointer;
 }
 .color-swatch{
-  width:28px;height:28px;border-radius:5px;
-  border:2px solid var(--border2);
-  cursor:pointer;
-  transition:transform .12s, box-shadow .12s;
-  display:block;
+  width:36px;height:36px;border-radius:4px;border:2px solid var(--border2);
+  cursor:pointer;display:block;transition:border-color .12s;pointer-events:none;
 }
-.color-swatch:hover{transform:scale(1.15);box-shadow:0 2px 10px rgba(0,0,0,.45);}
-.color-swatch:active{transform:scale(1.0);}
-.color-input-hidden{
-  position:absolute;opacity:0;width:0;height:0;
-  top:0;left:0;pointer-events:none;
+.color-swatch-wrap:hover .color-swatch{border-color:var(--text2);}
+/* Real color input: invisible but covers the label — fully touch-compatible */
+.color-input-real{
+  position:absolute;inset:0;width:100%;height:100%;
+  opacity:0;cursor:pointer;border:none;padding:0;margin:0;
+  -webkit-appearance:none;
 }
-.btn-reset-color{
-  font-size:.65rem;color:var(--text3);background:transparent;border:none;
-  cursor:pointer;padding:.18rem .35rem;transition:color .12s;
-  line-height:1;white-space:nowrap;border-radius:2px;
-}
-.btn-reset-color:hover{color:var(--red);background:var(--red-soft);}
-.customize-empty{
-  padding:1.5rem 1rem;font-size:.78rem;
-  color:var(--text3);font-style:italic;text-align:center;
-}
-
-/* Mobile tweaks for customize modal */
-@media(max-width:600px){
-  .customize-modal{max-height:75vh;max-width:100%;}
-  .customize-row{padding:.7rem 1rem;min-height:52px;}
-  .color-swatch{width:34px;height:34px;border-radius:7px;}
-  .customize-subject-name{font-size:.9rem;}
-  .btn-reset-color{font-size:.72rem;padding:.22rem .45rem;}
+/* Legacy hidden input — kept for compatibility */
+.color-input-hidden{position:absolute;width:0;height:0;opacity:0;pointer-events:none;}
+.btn-reset-color{font-size:.72rem;color:var(--text3);background:var(--surface2);border:1px solid var(--border);cursor:pointer;padding:.3rem .5rem;border-radius:1px;transition:all .12s;white-space:nowrap;min-height:32px;}
+.btn-reset-color:hover{color:var(--red);border-color:var(--red);}
+.customize-empty{padding:1.5rem 1rem;font-size:.75rem;color:var(--text3);font-style:italic;text-align:center;}
+@media(min-width:480px){
+  .customize-modal{border-radius:2px;margin:auto;}
 }
 
 /* ── V4: Week reorder modal ── */
@@ -425,7 +386,8 @@ select:focus{border-color:var(--accent);}
   .form-grid-3x2{grid-template-columns:1fr 1fr;}
   .topbar{height:auto;padding:.5rem .8rem;}
   .week-bar{padding:.55rem .8rem;}
-  .calendar-wrap{padding:.65rem .8rem 2rem;}
+  /* Use padding on all sides so the grid outline is never clipped by overflow */
+  .calendar-wrap{padding:.6rem 1px 2rem 1px;}
   .admin-panel{padding:.85rem .8rem;}
   .login-card{padding:1.8rem 1.5rem;}
   .day-events{padding:4.5rem .5rem .6rem;}
@@ -510,13 +472,14 @@ select:focus{border-color:var(--accent);}
         <div id="topbar-avatar-wrap"></div>
         <span id="topbar-name"></span>
       </div>
-      <!-- V4: Customize button -->
-      <button class="customize-btn" id="customize-btn" onclick="v4OpenCustomize()">🎨 Personalizar</button>
+      <!-- V4: Customize button (visible to all users) — opens modal overlay -->
+      <div class="customize-panel-wrap">
+        <button class="customize-btn" onclick="v4OpenCustomize()">🎨 Personalizar</button>
+      </div>
       <button class="btn-sm" onclick="openSettings()">⚙</button>
       <button class="btn-sm" onclick="doLogout()">Salir</button>
     </div>
   </div>
-  <!-- Mobile backdrop for customize panel (unused now, kept for safety) -->
 
   <div class="week-bar">
     <div class="week-select-wrap">
@@ -694,6 +657,17 @@ select:focus{border-color:var(--accent);}
   </div>
 </div>
 
+<!-- V4: CUSTOMIZE MODAL (overlay, works on mobile and PC) -->
+<div class="overlay" id="customize-overlay" onclick="handleOverlayClick(event,'customize-overlay')" style="align-items:flex-end;padding:0;">
+  <div class="customize-modal" onclick="event.stopPropagation()">
+    <div class="customize-header">
+      <span>🎨 Color de tarjetas por materia</span>
+      <button class="customize-close" onclick="closeOverlay('customize-overlay')">✕</button>
+    </div>
+    <div class="customize-body" id="customize-subjects-list"></div>
+  </div>
+</div>
+
 <!-- V4: FINAL DELETE CONFIRM -->
 <div class="overlay" id="delete-final-overlay" onclick="handleOverlayClick(event,'delete-final-overlay')">
   <div class="modal" style="max-width:340px">
@@ -729,22 +703,11 @@ select:focus{border-color:var(--accent);}
   </div>
 </div>
 
-<!-- V4: CUSTOMIZE COLORS MODAL -->
-<div class="customize-overlay" id="customize-overlay" onclick="v4HandleCustomizeOverlayClick(event)">
-  <div class="customize-modal" id="customize-modal">
-    <div class="customize-modal-header">
-      <div class="customize-modal-title">🎨 Personalizar colores</div>
-      <button class="btn-close" onclick="v4CloseCustomize()">✕</button>
-    </div>
-    <div class="customize-modal-body" id="customize-subjects-list"></div>
-  </div>
-</div>
-
 <!-- ══ FIREBASE SCRIPT ══ -->
 <script type="module">
 import { initializeApp }
   from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged }
+import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged, setPersistence, browserLocalPersistence }
   from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import { getDatabase, ref, onValue, set, remove, get }
   from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
@@ -764,6 +727,9 @@ const fbApp   = initializeApp(firebaseConfig);
 const auth    = getAuth(fbApp);
 const db      = getDatabase(fbApp);
 const provider = new GoogleAuthProvider();
+
+// ── Persistencia LOCAL — la sesión sobrevive recargas sin pedir login ──
+setPersistence(auth, browserLocalPersistence).catch(()=>{});
 
 // ── Constants ──
 const ADMIN_EMAIL = "mawhysha@gmail.com";
@@ -1338,47 +1304,21 @@ function v4ShowSavedProfileCard(saved){
   sec.style.display = 'block';
 }
 
-// ── V4 Quick sign-in: try silent re-auth via currentUser, fallback to popup ──
+// ── V4 Quick sign-in ──
+// Con setPersistence(browserLocalPersistence), si la sesión de Google sigue activa
+// el popup se cierra instantáneamente sin que el usuario vea nada.
+// Si la sesión expiró, muestra el selector de cuenta de Google normalmente.
 window.v4QuickSignIn = async function(){
-  const saved = v4GetSavedProfile();
   const wrap = document.getElementById('saved-profile-btn-wrap');
-
-  // If Firebase already has a current user (token still valid), skip popup
-  const existing = auth.currentUser;
-  if(existing){
-    // Already authenticated — onAuthStateChanged will have fired; just re-trigger app start
-    wrap.innerHTML = '<div style="padding:.7rem 0;text-align:center"><div class="connecting-spinner" style="margin:0 auto .5rem"></div><div class="connecting-text">Entrando…</div></div>';
-    const snap = await get(userRef(existing.uid));
-    if(snap.exists() && snap.val().displayName){
-      currentUser = existing;
-      isAdmin = existing.email === ADMIN_EMAIL;
-      displayName = snap.val().displayName;
-      v4SetSavedProfile({name: displayName, email: existing.email, photo: existing.photoURL||null, uid: existing.uid});
-      transition(()=> startApp());
-    } else {
-      showNameSetup(existing);
-    }
-    return;
-  }
-
-  wrap.innerHTML = '<div style="padding:.7rem 0;text-align:center"><div class="connecting-spinner" style="margin:0 auto .5rem"></div><div class="connecting-text">Verificando sesión…</div></div>';
+  wrap.innerHTML = '<div style="padding:.7rem 0;text-align:center"><div class="connecting-spinner" style="margin:0 auto .5rem"></div><div class="connecting-text">Verificando…</div></div>';
   try{
-    // hint Google to select the saved account automatically
-    const hintedProvider = new GoogleAuthProvider();
-    if(saved && saved.email){
-      hintedProvider.setCustomParameters({ login_hint: saved.email, prompt: 'none' });
-    }
-    await signInWithPopup(auth, hintedProvider);
-    // onAuthStateChanged handles the rest
+    await signInWithPopup(auth, provider);
+    // onAuthStateChanged detecta el usuario y llama startApp automáticamente
   }catch(e){
-    // If 'prompt:none' fails (user must interact), fall back to normal popup
-    try{
-      const normalProvider = new GoogleAuthProvider();
-      if(saved && saved.email) normalProvider.setCustomParameters({ login_hint: saved.email });
-      await signInWithPopup(auth, normalProvider);
-    }catch(e2){
-      if(saved) v4ShowSavedProfileCard(saved);
-      else showEl('login-main-section');
+    const saved = v4GetSavedProfile();
+    if(saved) v4ShowSavedProfileCard(saved);
+    else showEl('login-main-section');
+    if(e.code !== 'auth/popup-closed-by-user'){
       showToast('No se pudo verificar. Intenta de nuevo.');
     }
   }
@@ -1390,79 +1330,61 @@ window.v4ShowFreshLogin = function(){
   showEl('login-main-section');
 };
 
-// ── V4 Subject colors (Firebase per user — real-time sync across all devices) ──
-// We track a pending-save timestamp so the listener can ignore its own echoes.
-let v4LastSaveTime = 0;
-
+// ── V4 Subject colors (Firebase per user) ──
 function v4ListenColors(){
   if(v4ColorsUnsub) v4ColorsUnsub();
   v4ColorsUnsub = onValue(v4ColorsRef(currentUser.uid), snap=>{
-    // Ignore echoes from our own recent save (within 3 seconds)
-    const now = Date.now();
-    if(now - v4LastSaveTime < 3000) return;
-    // External change from another device — apply it
     v4SubjectColors = snap.val() || {};
     renderCalendar();
-    if(v4CustomizeOpen) v4RenderCustomizeList();
+    v4RenderCustomizeList();
   });
 }
 async function v4SaveColors(){
   if(!currentUser) return;
-  v4LastSaveTime = Date.now(); // mark so listener ignores echo
   try{ await set(v4ColorsRef(currentUser.uid), v4SubjectColors); }catch(e){}
 }
 
-// ── V4 Customize modal ──
+// ── V4 Customize — modal overlay (compatible móvil/PC) ──
 window.v4OpenCustomize = function(){
-  v4CustomizeOpen = true;
   v4RenderCustomizeList();
-  document.getElementById('customize-overlay').classList.add('open');
+  openOverlay('customize-overlay');
 };
+// Alias por compatibilidad
+window.v4ToggleCustomize = window.v4OpenCustomize;
+
 window.v4CloseCustomize = function(){
-  v4CustomizeOpen = false;
-  document.getElementById('customize-overlay').classList.remove('open');
+  closeOverlay('customize-overlay');
 };
-window.v4HandleCustomizeOverlayClick = function(e){
-  if(e.target === document.getElementById('customize-overlay')) v4CloseCustomize();
-};
+// v4HandleCustomizeOverlay ya no necesario — handleOverlayClick lo maneja
 
 function v4RenderCustomizeList(){
   const list = document.getElementById('customize-subjects-list');
   if(!list) return;
   if(!subjects.length){
-    list.innerHTML = '<div class="customize-empty">No hay materias definidas aún. El administrador debe agregar materias primero.</div>';
+    list.innerHTML = '<div class="customize-empty">No hay materias definidas aún.<br>Agrega materias desde el panel de administrador.</div>';
     return;
   }
+  // Usamos <label> envolviendo el input color para máxima compatibilidad táctil en iOS/Android
   list.innerHTML = subjects.map((s, idx) => {
     const color  = v4SubjectColors[s] || '#7c6cfc';
-    const safeId = 'v4c_' + idx + '_' + s.replace(/[^a-z0-9]/gi,'_');
-    const hasCustom = !!v4SubjectColors[s];
+    const inputId = 'v4cin_' + idx;
     return `<div class="customize-row">
       <span class="customize-subject-name">${esc(s)}</span>
       <div class="customize-color-wrap">
-        <label for="${safeId}" class="color-swatch-label" title="Cambiar color de ${esc(s)}">
-          <div class="color-swatch" id="swatch_${safeId}" style="background:${color}"></div>
-          <input type="color" id="${safeId}" class="color-input-hidden" value="${color}"
-            oninput="v4PreviewColor('${esc(s)}','${safeId}',this.value)"
-            onchange="v4SetSubjectColor('${esc(s)}',this.value)">
+        <label class="color-swatch-wrap" title="Cambiar color de ${esc(s)}">
+          <div class="color-swatch" style="background:${color}"></div>
+          <input type="color" id="${inputId}" class="color-input-real" value="${color}"
+            oninput="v4SetSubjectColor('${esc(s).replace(/\\/g,'\\\\').replace(/'/g,'\\x27')}', this.value)"
+            onchange="v4SetSubjectColor('${esc(s).replace(/\\/g,'\\\\').replace(/'/g,'\\x27')}', this.value)">
         </label>
-        ${hasCustom
-          ? `<button class="btn-reset-color" title="Restablecer color" onclick="v4ResetColor('${esc(s)}')">↺</button>`
-          : '<span style="width:1.8rem"></span>'}
+        ${v4SubjectColors[s]
+          ? `<button class="btn-reset-color" onclick="v4ResetColor('${esc(s).replace(/'/g,'\\x27')}')">↺ Reset</button>`
+          : ''}
       </div>
     </div>`;
   }).join('');
 }
 
-// Preview color live while dragging picker (updates local state + cards, no Firebase write)
-window.v4PreviewColor = function(subject, safeId, color){
-  const sw = document.getElementById('swatch_' + safeId);
-  if(sw) sw.style.background = color;
-  v4SubjectColors[subject] = color;
-  renderCalendar();
-};
-
-// Final color pick — save to Firebase (syncs to all devices with same account)
 window.v4SetSubjectColor = function(subject, color){
   v4SubjectColors[subject] = color;
   v4SaveColors();
