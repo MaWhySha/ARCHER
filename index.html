@@ -196,9 +196,8 @@ select:focus{border-color:var(--accent);}
   grid-template-columns:repeat(7,minmax(152px,1fr));
   gap:0;
   background:var(--bg);
-  border:1px solid var(--border);
-  border-right:none;
-  border-bottom:none;
+  border-top:1px solid var(--border);
+  border-left:1px solid var(--border);
   min-width:840px;
 }
 .day-col{background:var(--surface);display:flex;flex-direction:column;border-right:1px solid var(--border);border-bottom:1px solid var(--border);}
@@ -317,81 +316,97 @@ select:focus{border-color:var(--accent);}
 .btn-switch-account{width:100%;padding:.58rem;background:transparent;border:1px solid var(--border2);color:var(--text3);font-family:'Instrument Sans',sans-serif;font-size:.75rem;cursor:pointer;border-radius:1px;transition:all .15s;margin-top:.5rem;}
 .btn-switch-account:hover{border-color:var(--text2);color:var(--text2);}
 
-/* ── V4: Customize dropdown (Desktop) ── */
-.customize-panel-wrap{position:relative;}
-.customize-btn{padding:.3rem .65rem;background:transparent;border:1px solid var(--border2);color:var(--text2);font-size:.68rem;cursor:pointer;border-radius:1px;transition:all .15s;font-family:'Instrument Sans',sans-serif;white-space:nowrap;}
+/* ── V4: Customize button ── */
+.customize-btn{
+  padding:.3rem .65rem;background:transparent;border:1px solid var(--border2);
+  color:var(--text2);font-size:.68rem;cursor:pointer;border-radius:1px;
+  transition:all .15s;font-family:'Instrument Sans',sans-serif;white-space:nowrap;
+}
 .customize-btn:hover{border-color:var(--accent);color:var(--accent);}
-.customize-dropdown{
-  position:absolute;top:calc(100% + .5rem);right:0;
+
+/* ── V4: Customize modal (centered overlay, works on all screen sizes) ── */
+.customize-overlay{
+  position:fixed;inset:0;background:rgba(0,0,0,.72);
+  z-index:600;display:none;
+  align-items:center;justify-content:center;
+  padding:1rem;
+  box-sizing:border-box;
+}
+.customize-overlay.open{display:flex;}
+.customize-modal{
   background:var(--surface);border:1px solid var(--border2);
-  width:280px;max-height:360px;overflow-y:auto;
-  box-shadow:0 12px 40px rgba(0,0,0,.5);z-index:1000;display:none;
+  width:100%;max-width:400px;
+  max-height:min(80vh, 520px);
+  display:flex;flex-direction:column;
+  box-shadow:0 24px 64px rgba(0,0,0,.7);
+  border-radius:2px;
+  animation:scaleIn .22s cubic-bezier(.16,1,.3,1) both;
+  overflow:hidden;
 }
-.customize-dropdown.open{display:block;}
-.customize-header{
+.customize-modal-header{
   display:flex;align-items:center;justify-content:space-between;
-  padding:.65rem .85rem .4rem;
-  font-family:'Syne',sans-serif;font-size:.63rem;font-weight:700;
-  text-transform:uppercase;letter-spacing:.1em;color:var(--text3);
+  padding:.75rem 1rem .55rem;
   border-bottom:1px solid var(--border);
-  position:sticky;top:0;background:var(--surface);z-index:2;
+  flex-shrink:0;
+  background:var(--surface);
 }
-.customize-close-btn{
-  background:transparent;border:none;color:var(--text3);
-  font-size:.9rem;cursor:pointer;width:22px;height:22px;
-  display:none;align-items:center;justify-content:center;border-radius:50%;
-  transition:all .12s;
+.customize-modal-title{
+  font-family:'Syne',sans-serif;font-size:.7rem;font-weight:700;
+  text-transform:uppercase;letter-spacing:.1em;color:var(--accent);
 }
-.customize-close-btn:hover{color:var(--red);background:var(--red-soft);}
-.customize-row{display:flex;align-items:center;justify-content:space-between;padding:.55rem .85rem;gap:.6rem;border-bottom:1px solid var(--border);}
+.customize-modal-body{
+  overflow-y:auto;flex:1;
+  /* smooth scroll on iOS */
+  -webkit-overflow-scrolling:touch;
+}
+.customize-row{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:.6rem 1rem;gap:.75rem;
+  border-bottom:1px solid var(--border);
+  min-height:48px;
+}
 .customize-row:last-child{border-bottom:none;}
-.customize-subject-name{font-size:.78rem;color:var(--text);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-.customize-color-wrap{display:flex;align-items:center;gap:.5rem;}
-.color-swatch{
-  width:22px;height:22px;border-radius:4px;border:2px solid var(--border2);
-  cursor:pointer;transition:transform .12s,box-shadow .12s;flex-shrink:0;
-  position:relative;z-index:1;
+.customize-subject-name{
+  font-size:.82rem;color:var(--text);flex:1;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
 }
-.color-swatch:hover{transform:scale(1.18);box-shadow:0 2px 8px rgba(0,0,0,.4);}
-.color-swatch:active{transform:scale(1.05);}
-.color-input-hidden{opacity:0;width:0;height:0;position:absolute;pointer-events:none;}
+.customize-color-wrap{display:flex;align-items:center;gap:.6rem;flex-shrink:0;}
+/* The label wraps the swatch + hidden input — clicking label triggers input */
+.color-swatch-label{
+  display:inline-flex;align-items:center;cursor:pointer;
+  position:relative;
+}
+.color-swatch{
+  width:28px;height:28px;border-radius:5px;
+  border:2px solid var(--border2);
+  cursor:pointer;
+  transition:transform .12s, box-shadow .12s;
+  display:block;
+}
+.color-swatch:hover{transform:scale(1.15);box-shadow:0 2px 10px rgba(0,0,0,.45);}
+.color-swatch:active{transform:scale(1.0);}
+.color-input-hidden{
+  position:absolute;opacity:0;width:0;height:0;
+  top:0;left:0;pointer-events:none;
+}
 .btn-reset-color{
   font-size:.65rem;color:var(--text3);background:transparent;border:none;
-  cursor:pointer;padding:.15rem .3rem;transition:color .12s;
-  line-height:1;white-space:nowrap;
+  cursor:pointer;padding:.18rem .35rem;transition:color .12s;
+  line-height:1;white-space:nowrap;border-radius:2px;
 }
-.btn-reset-color:hover{color:var(--red);}
-.customize-empty{padding:1rem .85rem;font-size:.72rem;color:var(--text3);font-style:italic;}
+.btn-reset-color:hover{color:var(--red);background:var(--red-soft);}
+.customize-empty{
+  padding:1.5rem 1rem;font-size:.78rem;
+  color:var(--text3);font-style:italic;text-align:center;
+}
 
-/* ── V4: Customize mobile overlay ── */
-.customize-backdrop{
-  display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);
-  z-index:980;
-}
-.customize-backdrop.open{display:block;}
+/* Mobile tweaks for customize modal */
 @media(max-width:600px){
-  .customize-dropdown{
-    position:fixed !important;
-    top:auto !important; right:0 !important; left:0 !important; bottom:0 !important;
-    width:100% !important;max-height:70vh !important;
-    border-radius:14px 14px 0 0;border-bottom:none;
-    z-index:990;overflow-y:auto;
-    transform:translateY(100%);
-    transition:transform .28s cubic-bezier(.16,1,.3,1);
-    display:block !important;visibility:hidden;
-  }
-  .customize-dropdown.open{
-    transform:translateY(0);visibility:visible;
-  }
-  .customize-header{
-    padding:.85rem 1rem .55rem;font-size:.7rem;
-    border-radius:14px 14px 0 0;
-  }
-  .customize-close-btn{display:flex;}
-  .customize-row{padding:.7rem 1rem;}
-  .color-swatch{width:28px;height:28px;border-radius:6px;}
-  .btn-reset-color{font-size:.7rem;padding:.2rem .4rem;}
-  .customize-subject-name{font-size:.85rem;}
+  .customize-modal{max-height:75vh;max-width:100%;}
+  .customize-row{padding:.7rem 1rem;min-height:52px;}
+  .color-swatch{width:34px;height:34px;border-radius:7px;}
+  .customize-subject-name{font-size:.9rem;}
+  .btn-reset-color{font-size:.72rem;padding:.22rem .45rem;}
 }
 
 /* ── V4: Week reorder modal ── */
@@ -496,23 +511,13 @@ select:focus{border-color:var(--accent);}
         <div id="topbar-avatar-wrap"></div>
         <span id="topbar-name"></span>
       </div>
-      <!-- V4: Customize button (visible to all users) -->
-      <div class="customize-panel-wrap" id="customize-panel-wrap">
-        <button class="customize-btn" id="customize-btn" onclick="v4ToggleCustomize(event)">🎨 Personalizar</button>
-        <div class="customize-dropdown" id="customize-dropdown">
-          <div class="customize-header">
-            <span>Color por materia</span>
-            <button class="customize-close-btn" onclick="v4CloseCustomize(event)">✕</button>
-          </div>
-          <div id="customize-subjects-list"></div>
-        </div>
-      </div>
+      <!-- V4: Customize button -->
+      <button class="customize-btn" id="customize-btn" onclick="v4OpenCustomize()">🎨 Personalizar</button>
       <button class="btn-sm" onclick="openSettings()">⚙</button>
       <button class="btn-sm" onclick="doLogout()">Salir</button>
     </div>
   </div>
-  <!-- Mobile backdrop for customize panel -->
-  <div class="customize-backdrop" id="customize-backdrop" onclick="v4CloseCustomize(event)"></div>
+  <!-- Mobile backdrop for customize panel (unused now, kept for safety) -->
 
   <div class="week-bar">
     <div class="week-select-wrap">
@@ -722,6 +727,17 @@ select:focus{border-color:var(--accent);}
       <button class="btn-modal-primary" onclick="v4SaveWeekOrder()">Guardar orden</button>
       <button class="btn-modal-secondary" onclick="closeOverlay('reorder-overlay')">Cancelar</button>
     </div>
+  </div>
+</div>
+
+<!-- V4: CUSTOMIZE COLORS MODAL -->
+<div class="customize-overlay" id="customize-overlay" onclick="v4HandleCustomizeOverlayClick(event)">
+  <div class="customize-modal" id="customize-modal">
+    <div class="customize-modal-header">
+      <div class="customize-modal-title">🎨 Personalizar colores</div>
+      <button class="btn-close" onclick="v4CloseCustomize()">✕</button>
+    </div>
+    <div class="customize-modal-body" id="customize-subjects-list"></div>
   </div>
 </div>
 
@@ -1389,78 +1405,63 @@ async function v4SaveColors(){
   try{ await set(v4ColorsRef(currentUser.uid), v4SubjectColors); }catch(e){}
 }
 
-// ── V4 Customize dropdown ──
-window.v4ToggleCustomize = function(e){
-  e.stopPropagation();
-  v4CustomizeOpen = !v4CustomizeOpen;
-  const dd = document.getElementById('customize-dropdown');
-  const bd = document.getElementById('customize-backdrop');
-  if(v4CustomizeOpen){
-    dd.classList.add('open');
-    if(bd) bd.classList.add('open');
-    v4RenderCustomizeList();
-    // Prevent body scroll on mobile when panel is open
-    if(window.innerWidth <= 600) document.body.style.overflow = 'hidden';
-  } else {
-    dd.classList.remove('open');
-    if(bd) bd.classList.remove('open');
-    document.body.style.overflow = '';
-  }
+// ── V4 Customize modal ──
+window.v4OpenCustomize = function(){
+  v4CustomizeOpen = true;
+  v4RenderCustomizeList();
+  document.getElementById('customize-overlay').classList.add('open');
 };
-window.v4CloseCustomize = function(e){
-  if(e) e.stopPropagation();
+window.v4CloseCustomize = function(){
   v4CustomizeOpen = false;
-  const dd = document.getElementById('customize-dropdown');
-  const bd = document.getElementById('customize-backdrop');
-  if(dd) dd.classList.remove('open');
-  if(bd) bd.classList.remove('open');
-  document.body.style.overflow = '';
+  document.getElementById('customize-overlay').classList.remove('open');
 };
-document.addEventListener('click', (e)=>{
-  if(v4CustomizeOpen){
-    const dd = document.getElementById('customize-dropdown');
-    const btn = document.getElementById('customize-btn');
-    // Only close on desktop click-outside; on mobile the backdrop handles it
-    if(window.innerWidth > 600){
-      if(!dd?.contains(e.target) && !btn?.contains(e.target)){
-        v4CloseCustomize();
-      }
-    }
-  }
-});
+window.v4HandleCustomizeOverlayClick = function(e){
+  if(e.target === document.getElementById('customize-overlay')) v4CloseCustomize();
+};
 
 function v4RenderCustomizeList(){
   const list = document.getElementById('customize-subjects-list');
   if(!list) return;
   if(!subjects.length){
-    list.innerHTML = '<div class="customize-empty">No hay materias definidas aún.</div>';
+    list.innerHTML = '<div class="customize-empty">No hay materias definidas aún. El administrador debe agregar materias primero.</div>';
     return;
   }
   list.innerHTML = subjects.map((s, idx) => {
     const color  = v4SubjectColors[s] || '#7c6cfc';
     const safeId = 'v4c_' + idx + '_' + s.replace(/[^a-z0-9]/gi,'_');
+    const hasCustom = !!v4SubjectColors[s];
     return `<div class="customize-row">
       <span class="customize-subject-name">${esc(s)}</span>
       <div class="customize-color-wrap">
-        <label for="${safeId}" class="color-swatch-label" style="display:inline-flex;align-items:center;cursor:pointer;position:relative;">
-          <div class="color-swatch" style="background:${color}"></div>
+        <label for="${safeId}" class="color-swatch-label" title="Cambiar color de ${esc(s)}">
+          <div class="color-swatch" id="swatch_${safeId}" style="background:${color}"></div>
           <input type="color" id="${safeId}" class="color-input-hidden" value="${color}"
-            onchange="v4SetSubjectColor('${esc(s)}', this.value)"
-            oninput="v4SetSubjectColor('${esc(s)}', this.value)">
+            oninput="v4PreviewColor('${esc(s)}','${safeId}',this.value)"
+            onchange="v4SetSubjectColor('${esc(s)}',this.value)">
         </label>
-        ${v4SubjectColors[s]
-          ? `<button class="btn-reset-color" onclick="v4ResetColor('${esc(s)}')">↺</button>`
-          : ''}
+        ${hasCustom
+          ? `<button class="btn-reset-color" title="Restablecer color" onclick="v4ResetColor('${esc(s)}')">↺</button>`
+          : '<span style="width:1.8rem"></span>'}
       </div>
     </div>`;
   }).join('');
 }
 
+// Preview color live while dragging (no Firebase save, no re-render)
+window.v4PreviewColor = function(subject, safeId, color){
+  // Update swatch visually
+  const sw = document.getElementById('swatch_' + safeId);
+  if(sw) sw.style.background = color;
+  // Update cards live
+  v4SubjectColors[subject] = color;
+  renderCalendar();
+};
+
 window.v4SetSubjectColor = function(subject, color){
   v4SubjectColors[subject] = color;
-  v4SaveColors();
-  renderCalendar();
-  v4RenderCustomizeList();
+  v4SaveColors();       // save to Firebase
+  renderCalendar();     // update card borders
+  v4RenderCustomizeList(); // refresh list (shows ↺ reset button)
 };
 window.v4ResetColor = function(subject){
   delete v4SubjectColors[subject];
