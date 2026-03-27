@@ -195,11 +195,11 @@ select:focus{border-color:var(--accent);}
   display:grid;
   grid-template-columns:repeat(7,minmax(152px,1fr));
   gap:0;
-  /* box-shadow draws outer border — not clipped by overflow-x:auto, works on all devices */
-  box-shadow:0 0 0 1px var(--border);
   min-width:840px;
+  /* box-shadow para el borde exterior — no se recorta con overflow-x:auto en ningún dispositivo */
+  box-shadow:0 0 0 1px var(--border);
 }
-/* Each cell draws its own right+bottom border via inset box-shadow — no layout impact */
+/* Borde interior de cada columna via inset box-shadow — no afecta dimensiones */
 .day-col{background:var(--surface);display:flex;flex-direction:column;box-shadow:inset -1px -1px 0 0 var(--border);}
 .day-header{padding:.6rem .7rem .5rem;background:var(--surface2);border-bottom:1px solid var(--border);position:sticky;top:54px;z-index:5;}
 .day-name{font-family:'Syne',sans-serif;font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--text2);}
@@ -1389,32 +1389,23 @@ window.v4ShowFreshLogin = function(){
   showEl('login-main-section');
 };
 
-// ── V4 Subject colors (Firebase per user — sincroniza entre dispositivos) ──
-
+// ── V4 Subject colors (Firebase por usuario — sync en tiempo real entre dispositivos) ──
 function v4ListenColors(){
   if(v4ColorsUnsub) v4ColorsUnsub();
   v4ColorsUnsub = onValue(v4ColorsRef(currentUser.uid), snap=>{
-    // Si acabamos de escribir nosotros, ignorar el eco (evita el revert)
+    // Ignorar el eco de nuestra propia escritura para evitar el revert
     if(v4ColorWriting) return;
-    const incoming = snap.val() || {};
-    v4SubjectColors = incoming;
+    v4SubjectColors = snap.val() || {};
     renderCalendar();
     if(v4CustomizeOpen) v4RenderCustomizeList();
   });
 }
-
 async function v4SaveColors(){
   if(!currentUser) return;
-  // Marcar que somos nosotros quienes escribimos — el listener ignorará el eco
-  v4ColorWriting = true;
-  try{
-    await set(v4ColorsRef(currentUser.uid), v4SubjectColors);
-  }catch(e){
-    showToast('Error al guardar color. Revisa tu conexión.');
-  }finally{
-    // Pequeño delay para que Firebase procese y el eco llegue antes de reactivar
-    setTimeout(()=>{ v4ColorWriting = false; }, 1500);
-  }
+  v4ColorWriting = true;                        // bloquear listener durante escritura
+  try{ await set(v4ColorsRef(currentUser.uid), v4SubjectColors); }catch(e){}
+  // Esperar que Firebase procese el eco (~500ms) antes de reactivar listener
+  setTimeout(()=>{ v4ColorWriting = false; }, 600);
 }
 
 // ── V4 Customize modal ──
