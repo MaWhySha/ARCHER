@@ -196,7 +196,7 @@ select:focus{border-color:var(--accent);}
   grid-template-columns:repeat(7,minmax(152px,1fr));
   gap:1px;
   background:var(--border);
-  border:1px solid var(--border);
+  outline:1px solid var(--border);
   min-width:840px;
 }
 .day-col{background:var(--surface);display:flex;flex-direction:column;}
@@ -422,7 +422,7 @@ select:focus{border-color:var(--accent);}
   .form-grid-3x2{grid-template-columns:1fr 1fr;}
   .topbar{height:auto;padding:.5rem .8rem;}
   .week-bar{padding:.55rem .8rem;}
-  .calendar-wrap{padding:.65rem .8rem 2rem 0.8rem;}
+  .calendar-wrap{padding:.65rem .8rem 2rem;}
   .admin-panel{padding:.85rem .8rem;}
   .login-card{padding:1.8rem 1.5rem;}
   .day-events{padding:4.5rem .5rem .6rem;}
@@ -1296,6 +1296,7 @@ function setDot(state){ const d=document.getElementById('sync-dot'); if(!d) retu
 // V4 state
 let v4SubjectColors = {};
 let v4ColorsUnsub   = null;
+let v4IgnoreNextSnapshot = false;
 let v4CustomizeOpen = false;
 let v4ReorderBuffer = [];
 let v4DragSrcIdx    = null;
@@ -1387,26 +1388,42 @@ window.v4ShowFreshLogin = function(){
   showEl('login-main-section');
 };
 
-// ── V4 Subject colors (Firebase per user — sync en tiempo real entre dispositivos) ──
+// ── V4 Subject colors — guardado en Firebase, sync entre dispositivos ──
+// Usamos get() para carga inicial (sin eco) y onValue para actualizaciones externas.
+
 function v4ListenColors(){
   if(v4ColorsUnsub){ v4ColorsUnsub(); v4ColorsUnsub=null; }
-  v4ColorsUnsub = onValue(v4ColorsRef(currentUser.uid), snap=>{
+  // Carga inicial con get() — sin riesgo de eco, sin revert
+  get(v4ColorsRef(currentUser.uid)).then(snap=>{
     v4SubjectColors = snap.val() || {};
     renderCalendar();
     if(v4CustomizeOpen) v4RenderCustomizeList();
+  }).catch(()=>{});
+  // Listener para sincronización desde OTROS dispositivos
+  v4ColorsUnsub = onValue(v4ColorsRef(currentUser.uid), snap=>{
+    if(v4IgnoreNextSnapshot){ v4IgnoreNextSnapshot=false; return; }
+    const incoming = snap.val() || {};
+    // Solo aplicar si el valor es diferente al local (viene de otro dispositivo)
+    const localJson = JSON.stringify(v4SubjectColors);
+    const incomingJson = JSON.stringify(incoming);
+    if(localJson !== incomingJson){
+      v4SubjectColors = incoming;
+      renderCalendar();
+      if(v4CustomizeOpen) v4RenderCustomizeList();
+    }
   });
 }
+
 async function v4SaveColors(){
   if(!currentUser) return;
-  // Desuscribir ANTES de escribir para que el eco no sobreescriba el estado local
-  if(v4ColorsUnsub){ v4ColorsUnsub(); v4ColorsUnsub=null; }
+  // Marcar que el próximo snapshot del listener es nuestro eco — ignorarlo
+  v4IgnoreNextSnapshot = true;
   try{
     await set(v4ColorsRef(currentUser.uid), v4SubjectColors);
   }catch(e){
-    showToast('Error al guardar color.');
+    v4IgnoreNextSnapshot = false;
+    showToast('Error al guardar color. Revisa tu conexión.');
   }
-  // Re-suscribir: el primer disparo trae el valor confirmado por Firebase
-  v4ListenColors();
 }
 
 // ── V4 Customize modal ──
