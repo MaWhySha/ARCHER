@@ -187,20 +187,21 @@ select:focus{border-color:var(--accent);}
 .calendar-wrap{
   overflow-x:auto;padding:.9rem 1rem;
   min-height:calc(100vh - 160px);
-  /* Fix mobile border cut: ensure the scrollable area has padding so border shows */
   padding-bottom:2rem;
+  /* Ensure the right border of last column is always visible */
+  box-sizing:border-box;
 }
 .calendar-grid{
   display:grid;
   grid-template-columns:repeat(7,minmax(152px,1fr));
-  gap:1px;
-  background:var(--border);
+  gap:0;
+  background:var(--bg);
   border:1px solid var(--border);
+  border-right:none;
+  border-bottom:none;
   min-width:840px;
-  /* Ensure last column border shows on mobile scroll */
-  margin-right:0;
 }
-.day-col{background:var(--surface);display:flex;flex-direction:column;}
+.day-col{background:var(--surface);display:flex;flex-direction:column;border-right:1px solid var(--border);border-bottom:1px solid var(--border);}
 .day-header{padding:.6rem .7rem .5rem;background:var(--surface2);border-bottom:1px solid var(--border);position:sticky;top:54px;z-index:5;}
 .day-name{font-family:'Syne',sans-serif;font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--text2);}
 .day-stats{font-size:.6rem;color:var(--text3);margin-top:.1rem;line-height:1.4;}
@@ -316,23 +317,82 @@ select:focus{border-color:var(--accent);}
 .btn-switch-account{width:100%;padding:.58rem;background:transparent;border:1px solid var(--border2);color:var(--text3);font-family:'Instrument Sans',sans-serif;font-size:.75rem;cursor:pointer;border-radius:1px;transition:all .15s;margin-top:.5rem;}
 .btn-switch-account:hover{border-color:var(--text2);color:var(--text2);}
 
-/* ── V4: Customize dropdown ── */
+/* ── V4: Customize dropdown (Desktop) ── */
 .customize-panel-wrap{position:relative;}
 .customize-btn{padding:.3rem .65rem;background:transparent;border:1px solid var(--border2);color:var(--text2);font-size:.68rem;cursor:pointer;border-radius:1px;transition:all .15s;font-family:'Instrument Sans',sans-serif;white-space:nowrap;}
 .customize-btn:hover{border-color:var(--accent);color:var(--accent);}
-.customize-dropdown{position:absolute;top:calc(100% + .5rem);right:0;background:var(--surface);border:1px solid var(--border2);width:265px;max-height:310px;overflow-y:auto;box-shadow:0 12px 40px rgba(0,0,0,.5);z-index:400;display:none;}
+.customize-dropdown{
+  position:absolute;top:calc(100% + .5rem);right:0;
+  background:var(--surface);border:1px solid var(--border2);
+  width:280px;max-height:360px;overflow-y:auto;
+  box-shadow:0 12px 40px rgba(0,0,0,.5);z-index:1000;display:none;
+}
 .customize-dropdown.open{display:block;}
-.customize-header{padding:.6rem .85rem .35rem;font-family:'Syne',sans-serif;font-size:.63rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--text3);border-bottom:1px solid var(--border);}
-.customize-row{display:flex;align-items:center;justify-content:space-between;padding:.48rem .85rem;gap:.6rem;border-bottom:1px solid var(--border);}
+.customize-header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:.65rem .85rem .4rem;
+  font-family:'Syne',sans-serif;font-size:.63rem;font-weight:700;
+  text-transform:uppercase;letter-spacing:.1em;color:var(--text3);
+  border-bottom:1px solid var(--border);
+  position:sticky;top:0;background:var(--surface);z-index:2;
+}
+.customize-close-btn{
+  background:transparent;border:none;color:var(--text3);
+  font-size:.9rem;cursor:pointer;width:22px;height:22px;
+  display:none;align-items:center;justify-content:center;border-radius:50%;
+  transition:all .12s;
+}
+.customize-close-btn:hover{color:var(--red);background:var(--red-soft);}
+.customize-row{display:flex;align-items:center;justify-content:space-between;padding:.55rem .85rem;gap:.6rem;border-bottom:1px solid var(--border);}
 .customize-row:last-child{border-bottom:none;}
 .customize-subject-name{font-size:.78rem;color:var(--text);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-.customize-color-wrap{display:flex;align-items:center;gap:.35rem;}
-.color-swatch{width:18px;height:18px;border-radius:3px;border:2px solid var(--border2);cursor:pointer;transition:transform .12s;flex-shrink:0;}
-.color-swatch:hover{transform:scale(1.2);}
+.customize-color-wrap{display:flex;align-items:center;gap:.5rem;}
+.color-swatch{
+  width:22px;height:22px;border-radius:4px;border:2px solid var(--border2);
+  cursor:pointer;transition:transform .12s,box-shadow .12s;flex-shrink:0;
+  position:relative;z-index:1;
+}
+.color-swatch:hover{transform:scale(1.18);box-shadow:0 2px 8px rgba(0,0,0,.4);}
+.color-swatch:active{transform:scale(1.05);}
 .color-input-hidden{opacity:0;width:0;height:0;position:absolute;pointer-events:none;}
-.btn-reset-color{font-size:.6rem;color:var(--text3);background:transparent;border:none;cursor:pointer;padding:.1rem .25rem;transition:color .12s;}
+.btn-reset-color{
+  font-size:.65rem;color:var(--text3);background:transparent;border:none;
+  cursor:pointer;padding:.15rem .3rem;transition:color .12s;
+  line-height:1;white-space:nowrap;
+}
 .btn-reset-color:hover{color:var(--red);}
 .customize-empty{padding:1rem .85rem;font-size:.72rem;color:var(--text3);font-style:italic;}
+
+/* ── V4: Customize mobile overlay ── */
+.customize-backdrop{
+  display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);
+  z-index:980;
+}
+.customize-backdrop.open{display:block;}
+@media(max-width:600px){
+  .customize-dropdown{
+    position:fixed !important;
+    top:auto !important; right:0 !important; left:0 !important; bottom:0 !important;
+    width:100% !important;max-height:70vh !important;
+    border-radius:14px 14px 0 0;border-bottom:none;
+    z-index:990;overflow-y:auto;
+    transform:translateY(100%);
+    transition:transform .28s cubic-bezier(.16,1,.3,1);
+    display:block !important;visibility:hidden;
+  }
+  .customize-dropdown.open{
+    transform:translateY(0);visibility:visible;
+  }
+  .customize-header{
+    padding:.85rem 1rem .55rem;font-size:.7rem;
+    border-radius:14px 14px 0 0;
+  }
+  .customize-close-btn{display:flex;}
+  .customize-row{padding:.7rem 1rem;}
+  .color-swatch{width:28px;height:28px;border-radius:6px;}
+  .btn-reset-color{font-size:.7rem;padding:.2rem .4rem;}
+  .customize-subject-name{font-size:.85rem;}
+}
 
 /* ── V4: Week reorder modal ── */
 .week-reorder-list{display:flex;flex-direction:column;gap:.3rem;margin-bottom:.6rem;}
@@ -348,8 +408,10 @@ select:focus{border-color:var(--accent);}
   .form-grid-3x2{grid-template-columns:1fr 1fr;}
   .topbar{height:auto;padding:.5rem .8rem;}
   .week-bar{padding:.55rem .8rem;}
-  /* V4 mobile grid fix: extra right padding so last column border is always visible */
+  /* Extra right padding so last column border always visible on mobile */
   .calendar-wrap{padding:.65rem 1rem 2rem;}
+  /* Ensure inner grid container has right margin to show last border */
+  .calendar-wrap > .calendar-grid{margin-right:1px;}
   .admin-panel{padding:.85rem .8rem;}
   .login-card{padding:1.8rem 1.5rem;}
   .day-events{padding:4.5rem .5rem .6rem;}
@@ -436,9 +498,12 @@ select:focus{border-color:var(--accent);}
       </div>
       <!-- V4: Customize button (visible to all users) -->
       <div class="customize-panel-wrap" id="customize-panel-wrap">
-        <button class="customize-btn" onclick="v4ToggleCustomize(event)">🎨 Personalizar</button>
+        <button class="customize-btn" id="customize-btn" onclick="v4ToggleCustomize(event)">🎨 Personalizar</button>
         <div class="customize-dropdown" id="customize-dropdown">
-          <div class="customize-header">Color de tarjetas por materia</div>
+          <div class="customize-header">
+            <span>Color por materia</span>
+            <button class="customize-close-btn" onclick="v4CloseCustomize(event)">✕</button>
+          </div>
           <div id="customize-subjects-list"></div>
         </div>
       </div>
@@ -446,6 +511,8 @@ select:focus{border-color:var(--accent);}
       <button class="btn-sm" onclick="doLogout()">Salir</button>
     </div>
   </div>
+  <!-- Mobile backdrop for customize panel -->
+  <div class="customize-backdrop" id="customize-backdrop" onclick="v4CloseCustomize(event)"></div>
 
   <div class="week-bar">
     <div class="week-select-wrap">
@@ -1256,18 +1323,49 @@ function v4ShowSavedProfileCard(saved){
   sec.style.display = 'block';
 }
 
-// ── V4 Quick sign-in (re-opens Google popup for the saved account) ──
+// ── V4 Quick sign-in: try silent re-auth via currentUser, fallback to popup ──
 window.v4QuickSignIn = async function(){
+  const saved = v4GetSavedProfile();
   const wrap = document.getElementById('saved-profile-btn-wrap');
+
+  // If Firebase already has a current user (token still valid), skip popup
+  const existing = auth.currentUser;
+  if(existing){
+    // Already authenticated — onAuthStateChanged will have fired; just re-trigger app start
+    wrap.innerHTML = '<div style="padding:.7rem 0;text-align:center"><div class="connecting-spinner" style="margin:0 auto .5rem"></div><div class="connecting-text">Entrando…</div></div>';
+    const snap = await get(userRef(existing.uid));
+    if(snap.exists() && snap.val().displayName){
+      currentUser = existing;
+      isAdmin = existing.email === ADMIN_EMAIL;
+      displayName = snap.val().displayName;
+      v4SetSavedProfile({name: displayName, email: existing.email, photo: existing.photoURL||null, uid: existing.uid});
+      transition(()=> startApp());
+    } else {
+      showNameSetup(existing);
+    }
+    return;
+  }
+
   wrap.innerHTML = '<div style="padding:.7rem 0;text-align:center"><div class="connecting-spinner" style="margin:0 auto .5rem"></div><div class="connecting-text">Verificando sesión…</div></div>';
   try{
-    await signInWithPopup(auth, provider);
+    // hint Google to select the saved account automatically
+    const hintedProvider = new GoogleAuthProvider();
+    if(saved && saved.email){
+      hintedProvider.setCustomParameters({ login_hint: saved.email, prompt: 'none' });
+    }
+    await signInWithPopup(auth, hintedProvider);
     // onAuthStateChanged handles the rest
   }catch(e){
-    const saved = v4GetSavedProfile();
-    if(saved) v4ShowSavedProfileCard(saved);
-    else showEl('login-main-section');
-    showToast('No se pudo verificar. Intenta de nuevo.');
+    // If 'prompt:none' fails (user must interact), fall back to normal popup
+    try{
+      const normalProvider = new GoogleAuthProvider();
+      if(saved && saved.email) normalProvider.setCustomParameters({ login_hint: saved.email });
+      await signInWithPopup(auth, normalProvider);
+    }catch(e2){
+      if(saved) v4ShowSavedProfileCard(saved);
+      else showEl('login-main-section');
+      showToast('No se pudo verificar. Intenta de nuevo.');
+    }
   }
 };
 
@@ -1295,14 +1393,39 @@ async function v4SaveColors(){
 window.v4ToggleCustomize = function(e){
   e.stopPropagation();
   v4CustomizeOpen = !v4CustomizeOpen;
-  document.getElementById('customize-dropdown').classList.toggle('open', v4CustomizeOpen);
-  if(v4CustomizeOpen) v4RenderCustomizeList();
-};
-document.addEventListener('click', ()=>{
+  const dd = document.getElementById('customize-dropdown');
+  const bd = document.getElementById('customize-backdrop');
   if(v4CustomizeOpen){
-    v4CustomizeOpen = false;
+    dd.classList.add('open');
+    if(bd) bd.classList.add('open');
+    v4RenderCustomizeList();
+    // Prevent body scroll on mobile when panel is open
+    if(window.innerWidth <= 600) document.body.style.overflow = 'hidden';
+  } else {
+    dd.classList.remove('open');
+    if(bd) bd.classList.remove('open');
+    document.body.style.overflow = '';
+  }
+};
+window.v4CloseCustomize = function(e){
+  if(e) e.stopPropagation();
+  v4CustomizeOpen = false;
+  const dd = document.getElementById('customize-dropdown');
+  const bd = document.getElementById('customize-backdrop');
+  if(dd) dd.classList.remove('open');
+  if(bd) bd.classList.remove('open');
+  document.body.style.overflow = '';
+};
+document.addEventListener('click', (e)=>{
+  if(v4CustomizeOpen){
     const dd = document.getElementById('customize-dropdown');
-    if(dd) dd.classList.remove('open');
+    const btn = document.getElementById('customize-btn');
+    // Only close on desktop click-outside; on mobile the backdrop handles it
+    if(window.innerWidth > 600){
+      if(!dd?.contains(e.target) && !btn?.contains(e.target)){
+        v4CloseCustomize();
+      }
+    }
   }
 });
 
@@ -1315,14 +1438,16 @@ function v4RenderCustomizeList(){
   }
   list.innerHTML = subjects.map((s, idx) => {
     const color  = v4SubjectColors[s] || '#7c6cfc';
-    const safeId = 'v4c_' + idx + '_' + s.replace(/[^a-z0-9]/gi,'');
+    const safeId = 'v4c_' + idx + '_' + s.replace(/[^a-z0-9]/gi,'_');
     return `<div class="customize-row">
       <span class="customize-subject-name">${esc(s)}</span>
       <div class="customize-color-wrap">
-        <div class="color-swatch" style="background:${color}"
-          onclick="document.getElementById('${safeId}').click()"></div>
-        <input type="color" id="${safeId}" class="color-input-hidden" value="${color}"
-          onchange="v4SetSubjectColor('${esc(s)}', this.value)">
+        <label for="${safeId}" class="color-swatch-label" style="display:inline-flex;align-items:center;cursor:pointer;position:relative;">
+          <div class="color-swatch" style="background:${color}"></div>
+          <input type="color" id="${safeId}" class="color-input-hidden" value="${color}"
+            onchange="v4SetSubjectColor('${esc(s)}', this.value)"
+            oninput="v4SetSubjectColor('${esc(s)}', this.value)">
+        </label>
         ${v4SubjectColors[s]
           ? `<button class="btn-reset-color" onclick="v4ResetColor('${esc(s)}')">↺</button>`
           : ''}
