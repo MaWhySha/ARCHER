@@ -195,12 +195,12 @@ select:focus{border-color:var(--accent);}
   display:grid;
   grid-template-columns:repeat(7,minmax(152px,1fr));
   gap:0;
+  background:var(--bg);
+  border-top:1px solid var(--border);
+  border-left:1px solid var(--border);
   min-width:840px;
-  /* box-shadow para el borde exterior — no se recorta con overflow-x:auto en ningún dispositivo */
-  box-shadow:0 0 0 1px var(--border);
 }
-/* Borde interior de cada columna via inset box-shadow — no afecta dimensiones */
-.day-col{background:var(--surface);display:flex;flex-direction:column;box-shadow:inset -1px -1px 0 0 var(--border);}
+.day-col{background:var(--surface);display:flex;flex-direction:column;border-right:1px solid var(--border);border-bottom:1px solid var(--border);}
 .day-header{padding:.6rem .7rem .5rem;background:var(--surface2);border-bottom:1px solid var(--border);position:sticky;top:54px;z-index:5;}
 .day-name{font-family:'Syne',sans-serif;font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--text2);}
 .day-stats{font-size:.6rem;color:var(--text3);margin-top:.1rem;line-height:1.4;}
@@ -423,7 +423,10 @@ select:focus{border-color:var(--accent);}
   .form-grid-3x2{grid-template-columns:1fr 1fr;}
   .topbar{height:auto;padding:.5rem .8rem;}
   .week-bar{padding:.55rem .8rem;}
-  .calendar-wrap{padding:.65rem .8rem 2rem;}
+  /* Extra right padding so last column border always visible on mobile */
+  .calendar-wrap{padding:.65rem 1rem 2rem;}
+  /* Ensure inner grid container has right margin to show last border */
+  .calendar-wrap > .calendar-grid{margin-right:1px;}
   .admin-panel{padding:.85rem .8rem;}
   .login-card{padding:1.8rem 1.5rem;}
   .day-events{padding:4.5rem .5rem .6rem;}
@@ -1297,7 +1300,6 @@ function setDot(state){ const d=document.getElementById('sync-dot'); if(!d) retu
 // V4 state
 let v4SubjectColors = {};
 let v4ColorsUnsub   = null;
-let v4ColorWriting  = false;
 let v4CustomizeOpen = false;
 let v4ReorderBuffer = [];
 let v4DragSrcIdx    = null;
@@ -1389,23 +1391,18 @@ window.v4ShowFreshLogin = function(){
   showEl('login-main-section');
 };
 
-// ── V4 Subject colors (Firebase por usuario — sync en tiempo real entre dispositivos) ──
+// ── V4 Subject colors (Firebase per user) ──
 function v4ListenColors(){
   if(v4ColorsUnsub) v4ColorsUnsub();
   v4ColorsUnsub = onValue(v4ColorsRef(currentUser.uid), snap=>{
-    // Ignorar el eco de nuestra propia escritura para evitar el revert
-    if(v4ColorWriting) return;
     v4SubjectColors = snap.val() || {};
     renderCalendar();
-    if(v4CustomizeOpen) v4RenderCustomizeList();
+    v4RenderCustomizeList();
   });
 }
 async function v4SaveColors(){
   if(!currentUser) return;
-  v4ColorWriting = true;                        // bloquear listener durante escritura
   try{ await set(v4ColorsRef(currentUser.uid), v4SubjectColors); }catch(e){}
-  // Esperar que Firebase procese el eco (~500ms) antes de reactivar listener
-  setTimeout(()=>{ v4ColorWriting = false; }, 600);
 }
 
 // ── V4 Customize modal ──
