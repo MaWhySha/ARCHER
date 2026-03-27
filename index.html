@@ -188,16 +188,21 @@ select:focus{border-color:var(--accent);}
   overflow-x:auto;padding:.9rem 1rem;
   min-height:calc(100vh - 160px);
   padding-bottom:2rem;
-  /* Ensure the right border of last column is always visible */
   box-sizing:border-box;
+}
+/* Este wrapper ES el borde — fondo del color del borde + padding de 1px visible entre celdas */
+.calendar-grid-wrapper{
+  display:inline-block;
+  min-width:840px;
+  width:max-content;
+  background:var(--border);
+  padding:1px;
 }
 .calendar-grid{
   display:grid;
   grid-template-columns:repeat(7,minmax(152px,1fr));
   gap:1px;
-  background:var(--border);
-  outline:1px solid var(--border);
-  min-width:840px;
+  min-width:838px;
 }
 .day-col{background:var(--surface);display:flex;flex-direction:column;}
 .day-header{padding:.6rem .7rem .5rem;background:var(--surface2);border-bottom:1px solid var(--border);position:sticky;top:54px;z-index:5;}
@@ -1226,7 +1231,7 @@ function renderCalendar(){
   const evsByDay={};
   DAYS.forEach(d=>evsByDay[d]=[]);
   (week.events||[]).forEach(ev=>{ if(evsByDay[ev.day]) evsByDay[ev.day].push(ev); });
-  let html=`<div class="calendar-grid">`;
+  let html=`<div class="calendar-grid-wrapper"><div class="calendar-grid">`;
   DAYS.forEach(day=>{
     const evs=evsByDay[day], total=evs.length;
     let pending=0;
@@ -1269,7 +1274,7 @@ function renderCalendar(){
     }
     html+=`</div></div>`;
   });
-  html+=`</div>`;
+  html+=`</div></div>`;
   wrap.innerHTML=html;
 }
 
@@ -1296,7 +1301,7 @@ function setDot(state){ const d=document.getElementById('sync-dot'); if(!d) retu
 // V4 state
 let v4SubjectColors = {};
 let v4ColorsUnsub   = null;
-let v4IgnoreNextSnapshot = false;
+let v4writing       = false;
 let v4CustomizeOpen = false;
 let v4ReorderBuffer = [];
 let v4DragSrcIdx    = null;
@@ -1388,42 +1393,37 @@ window.v4ShowFreshLogin = function(){
   showEl('login-main-section');
 };
 
-// ── V4 Subject colors — guardado en Firebase, sync entre dispositivos ──
-// Usamos get() para carga inicial (sin eco) y onValue para actualizaciones externas.
+// ── V4 Subject colors (Firebase per user — persiste y sincroniza entre dispositivos) ──
 
 function v4ListenColors(){
   if(v4ColorsUnsub){ v4ColorsUnsub(); v4ColorsUnsub=null; }
-  // Carga inicial con get() — sin riesgo de eco, sin revert
+
+  // 1) Carga inicial con get() — lee directamente del servidor, sin eco, sin revert
   get(v4ColorsRef(currentUser.uid)).then(snap=>{
     v4SubjectColors = snap.val() || {};
     renderCalendar();
     if(v4CustomizeOpen) v4RenderCustomizeList();
   }).catch(()=>{});
-  // Listener para sincronización desde OTROS dispositivos
+
+  // 2) Listener para sincronizar cambios que vengan de OTROS dispositivos
   v4ColorsUnsub = onValue(v4ColorsRef(currentUser.uid), snap=>{
-    if(v4IgnoreNextSnapshot){ v4IgnoreNextSnapshot=false; return; }
-    const incoming = snap.val() || {};
-    // Solo aplicar si el valor es diferente al local (viene de otro dispositivo)
-    const localJson = JSON.stringify(v4SubjectColors);
-    const incomingJson = JSON.stringify(incoming);
-    if(localJson !== incomingJson){
-      v4SubjectColors = incoming;
-      renderCalendar();
-      if(v4CustomizeOpen) v4RenderCustomizeList();
-    }
+    if(v4writing) return; // ignorar eco de nuestra propia escritura
+    v4SubjectColors = snap.val() || {};
+    renderCalendar();
+    if(v4CustomizeOpen) v4RenderCustomizeList();
   });
 }
 
 async function v4SaveColors(){
   if(!currentUser) return;
-  // Marcar que el próximo snapshot del listener es nuestro eco — ignorarlo
-  v4IgnoreNextSnapshot = true;
+  v4writing = true;
   try{
     await set(v4ColorsRef(currentUser.uid), v4SubjectColors);
   }catch(e){
-    v4IgnoreNextSnapshot = false;
-    showToast('Error al guardar color. Revisa tu conexión.');
+    showToast('Error al guardar. Revisa tu conexión.');
   }
+  // Soltar el flag después de que Firebase procese el eco (~800ms)
+  setTimeout(()=>{ v4writing = false; }, 800);
 }
 
 // ── V4 Customize modal ──
