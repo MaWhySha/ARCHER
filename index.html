@@ -1302,6 +1302,7 @@ function setDot(state){ const d=document.getElementById('sync-dot'); if(!d) retu
 // V4 state
 let v4SubjectColors = {};
 let v4ColorsUnsub   = null;
+let v4ColorsSaving  = false;
 let v4CustomizeOpen = false;
 let v4ReorderBuffer = [];
 let v4DragSrcIdx    = null;
@@ -1393,10 +1394,16 @@ window.v4ShowFreshLogin = function(){
   showEl('login-main-section');
 };
 
-// ── V4 Subject colors — Firebase only, igual que los estados (sincroniza entre dispositivos) ──
+// ── V4 Subject colors — mismo patrón que los estados ──
+// v4SubjectColors actúa igual que userStatuses: se modifica local primero,
+// se guarda en Firebase, y el listener solo aplica cambios externos.
+
 function v4ListenColors(){
   if(v4ColorsUnsub) v4ColorsUnsub();
   v4ColorsUnsub = onValue(v4ColorsRef(currentUser.uid), snap=>{
+    // Si acabamos de guardar nosotros mismos, ignorar este echo y apagar la bandera
+    if(v4ColorsSaving){ v4ColorsSaving = false; return; }
+    // Viene de otro dispositivo o es la carga inicial — aplicar
     v4SubjectColors = snap.val() || {};
     renderCalendar();
     v4RenderCustomizeList();
@@ -1404,7 +1411,12 @@ function v4ListenColors(){
 }
 async function v4SaveColors(){
   if(!currentUser) return;
-  try{ await set(v4ColorsRef(currentUser.uid), v4SubjectColors); }catch(e){}
+  v4ColorsSaving = true; // el próximo snapshot somos nosotros, ignorarlo
+  try{
+    await set(v4ColorsRef(currentUser.uid), v4SubjectColors);
+  }catch(e){
+    v4ColorsSaving = false; // si falla, no ignorar el siguiente snapshot
+  }
 }
 
 // ── V4 Customize modal ──
