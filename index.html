@@ -1302,7 +1302,7 @@ function setDot(state){ const d=document.getElementById('sync-dot'); if(!d) retu
 // V4 state
 let v4SubjectColors = {};
 let v4ColorsUnsub   = null;
-let v4ColorsSaving  = false;
+let v4ColorsWriting = false;
 let v4CustomizeOpen = false;
 let v4ReorderBuffer = [];
 let v4DragSrcIdx    = null;
@@ -1394,29 +1394,42 @@ window.v4ShowFreshLogin = function(){
   showEl('login-main-section');
 };
 
-// ── V4 Subject colors — mismo patrón que los estados ──
-// v4SubjectColors actúa igual que userStatuses: se modifica local primero,
-// se guarda en Firebase, y el listener solo aplica cambios externos.
+// ── V4 Subject colors (Firebase per user) ──
+// Se guarda cada materia individualmente para evitar condiciones de carrera.
+// El listener onValue recibe siempre el objeto completo desde Firebase.
 
 function v4ListenColors(){
   if(v4ColorsUnsub) v4ColorsUnsub();
   v4ColorsUnsub = onValue(v4ColorsRef(currentUser.uid), snap=>{
-    // Si acabamos de guardar nosotros mismos, ignorar este echo y apagar la bandera
-    if(v4ColorsSaving){ v4ColorsSaving = false; return; }
-    // Viene de otro dispositivo o es la carga inicial — aplicar
-    v4SubjectColors = snap.val() || {};
+    // Si estamos en medio de un write propio, ignorar este echo
+    if(v4ColorsWriting) return;
+    const val = snap.val();
+    if(val && typeof val === 'object'){
+      // Firebase tiene datos — usarlos siempre como fuente de verdad
+      v4SubjectColors = val;
+    } else {
+      // Primera vez sin datos: inicializar con azul por defecto para todas las materias
+      v4SubjectColors = {};
+      if(subjects.length){
+        subjects.forEach(s => { v4SubjectColors[s] = '#4da6ff'; });
+        // Guardar el default en Firebase para que otros dispositivos también lo vean
+        set(v4ColorsRef(currentUser.uid), v4SubjectColors).catch(()=>{});
+      }
+    }
     renderCalendar();
     v4RenderCustomizeList();
   });
 }
+
+// Guarda TODO el objeto de una vez (igual que fbSaveStatuses)
 async function v4SaveColors(){
   if(!currentUser) return;
-  v4ColorsSaving = true; // el próximo snapshot somos nosotros, ignorarlo
+  v4ColorsWriting = true;
   try{
     await set(v4ColorsRef(currentUser.uid), v4SubjectColors);
-  }catch(e){
-    v4ColorsSaving = false; // si falla, no ignorar el siguiente snapshot
-  }
+  }catch(e){}
+  // Esperar un tick para que el echo del onValue pase antes de bajar la bandera
+  setTimeout(()=>{ v4ColorsWriting = false; }, 800);
 }
 
 // ── V4 Customize modal ──
