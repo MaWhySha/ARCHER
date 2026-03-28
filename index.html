@@ -788,6 +788,7 @@ let verifyCode    = "";
 // ── DB refs ──
 const schedRef    = () => ref(db, 'schedule');
 const subjRef     = () => ref(db, 'subjects');
+const colorsRef   = () => ref(db, 'subjectColors');
 const userRef     = (uid) => ref(db, `users/${uid}`);
 const statusRef   = (uid) => ref(db, `statuses/${uid}`);
 
@@ -1302,12 +1303,10 @@ function setDot(state){ const d=document.getElementById('sync-dot'); if(!d) retu
 // V4 state
 let v4SubjectColors = {};
 let v4ColorsUnsub   = null;
-let v4ColorsWriting = false;
 let v4CustomizeOpen = false;
 let v4ReorderBuffer = [];
 let v4DragSrcIdx    = null;
 const V4_PROFILE_KEY = 'archer_v4_saved_profile';
-const v4ColorsRef    = (uid) => ref(db, `subjectColors/${uid}`);
 
 // ── V4 Saved profile (localStorage — only name/email/photo, no passwords) ──
 function v4GetSavedProfile(){
@@ -1394,42 +1393,17 @@ window.v4ShowFreshLogin = function(){
   showEl('login-main-section');
 };
 
-// ── V4 Subject colors (Firebase per user) ──
-// Se guarda cada materia individualmente para evitar condiciones de carrera.
-// El listener onValue recibe siempre el objeto completo desde Firebase.
-
+// ── V4 Subject colors — guardados en Firebase como 'subjectColors' (igual que 'subjects') ──
 function v4ListenColors(){
   if(v4ColorsUnsub) v4ColorsUnsub();
-  v4ColorsUnsub = onValue(v4ColorsRef(currentUser.uid), snap=>{
-    // Si estamos en medio de un write propio, ignorar este echo
-    if(v4ColorsWriting) return;
-    const val = snap.val();
-    if(val && typeof val === 'object'){
-      // Firebase tiene datos — usarlos siempre como fuente de verdad
-      v4SubjectColors = val;
-    } else {
-      // Primera vez sin datos: inicializar con azul por defecto para todas las materias
-      v4SubjectColors = {};
-      if(subjects.length){
-        subjects.forEach(s => { v4SubjectColors[s] = '#4da6ff'; });
-        // Guardar el default en Firebase para que otros dispositivos también lo vean
-        set(v4ColorsRef(currentUser.uid), v4SubjectColors).catch(()=>{});
-      }
-    }
+  v4ColorsUnsub = onValue(colorsRef(), snap=>{
+    v4SubjectColors = snap.val() || {};
     renderCalendar();
     v4RenderCustomizeList();
   });
 }
-
-// Guarda TODO el objeto de una vez (igual que fbSaveStatuses)
 async function v4SaveColors(){
-  if(!currentUser) return;
-  v4ColorsWriting = true;
-  try{
-    await set(v4ColorsRef(currentUser.uid), v4SubjectColors);
-  }catch(e){}
-  // Esperar un tick para que el echo del onValue pase antes de bajar la bandera
-  setTimeout(()=>{ v4ColorsWriting = false; }, 800);
+  try{ await set(colorsRef(), v4SubjectColors); }catch(e){}
 }
 
 // ── V4 Customize modal ──
@@ -1539,7 +1513,6 @@ window.v4ExecuteDelete = async function(){
   try{
     await remove(userRef(currentUser.uid));
     await remove(statusRef(currentUser.uid));
-    await remove(v4ColorsRef(currentUser.uid));
   }catch(e){}
   v4ClearSavedProfile();
   closeOverlay('delete-final-overlay');
