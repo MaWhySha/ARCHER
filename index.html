@@ -782,7 +782,7 @@ let subjects      = [];
 let userStatuses  = {};
 let editingEvId   = null, editingWeekIdx = null;
 let pendingDeleteFn = null;
-let schedUnsub    = null, statusUnsub = null, colorsUnsub = null;
+let schedUnsub    = null, statusUnsub = null, colorUnsub = null;
 let verifyCode    = "";
 
 // ── DB refs ──
@@ -790,7 +790,7 @@ const schedRef    = () => ref(db, 'schedule');
 const subjRef     = () => ref(db, 'subjects');
 const userRef     = (uid) => ref(db, `users/${uid}`);
 const statusRef   = (uid) => ref(db, `statuses/${uid}`);
-const colorsRef   = (uid) => ref(db, `subjectColors/${uid}`);
+const colorRef    = (uid) => ref(db, `subjectColors/${uid}`);
 
 // ── Transition helper ──
 function transition(fn){
@@ -932,14 +932,13 @@ function startApp(){
   listenSubjects();
   listenStatuses();
   listenColors();
-  v4ListenColors();
 }
 
 // ── Logout ──
 window.doLogout = async function(){
   if(schedUnsub){ schedUnsub(); schedUnsub=null; }
   if(statusUnsub){ statusUnsub(); statusUnsub=null; }
-  if(colorsUnsub){ colorsUnsub(); colorsUnsub=null; }
+  if(colorUnsub){ colorUnsub(); colorUnsub=null; }
   const v4saved = v4GetSavedProfile();
   transition(async ()=>{
     await signOut(auth);
@@ -987,12 +986,13 @@ function listenStatuses(){
   if(statusUnsub) statusUnsub();
   statusUnsub = onValue(statusRef(currentUser.uid), snap=>{
     userStatuses = snap.val() || {};
-    renderCalendar();
+    renderCalendar(); // refresh with updated statuses
   });
 }
+
 function listenColors(){
-  if(colorsUnsub) colorsUnsub();
-  colorsUnsub = onValue(colorsRef(currentUser.uid), snap=>{
+  if(colorUnsub) colorUnsub();
+  colorUnsub = onValue(colorRef(currentUser.uid), snap=>{
     v4SubjectColors = snap.val() || {};
     renderCalendar();
     v4RenderCustomizeList();
@@ -1012,7 +1012,7 @@ async function fbSaveStatuses(){
   try{ await set(statusRef(currentUser.uid), userStatuses); }catch(e){}
 }
 async function fbSaveColors(){
-  try{ await set(colorsRef(currentUser.uid), v4SubjectColors); }catch(e){}
+  try{ await set(colorRef(currentUser.uid), v4SubjectColors); }catch(e){}
 }
 
 // ── Confirm modal ──
@@ -1404,11 +1404,11 @@ window.v4ShowFreshLogin = function(){
   showEl('login-main-section');
 };
 
-// ── V4 Subject colors — delega a listenColors/fbSaveColors (mismo patrón que statuses) ──
-function v4ListenColors(){ /* listenColors() ya está activo desde startApp */ }
+// ── V4 Subject colors — usa fbSaveColors/listenColors (mismo patrón que statuses) ──
 async function v4SaveColors(){
-  fbSaveColors();
+  await fbSaveColors();
 }
+function v4ListenColors(){ /* listenColors() se llama desde startApp */ }
 
 // ── V4 Customize modal ──
 window.v4OpenCustomize = function(){
@@ -1517,7 +1517,7 @@ window.v4ExecuteDelete = async function(){
   try{
     await remove(userRef(currentUser.uid));
     await remove(statusRef(currentUser.uid));
-    await remove(colorsRef(currentUser.uid));
+    await remove(colorRef(currentUser.uid));
   }catch(e){}
   v4ClearSavedProfile();
   closeOverlay('delete-final-overlay');
