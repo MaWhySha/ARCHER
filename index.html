@@ -192,11 +192,11 @@ select:focus{border-color:var(--accent);}
 }
 .calendar-grid{
   display:grid;
-  grid-template-columns:repeat(7,140px);
-  min-width:max-content;
+  grid-template-columns:repeat(7,calc(100% / 7));
   width:100%;
   border:1px solid var(--border);
   box-sizing:border-box;
+  min-width:840px;
 }
 .day-col{
   background:var(--surface);display:flex;flex-direction:column;
@@ -432,6 +432,10 @@ select:focus{border-color:var(--accent);}
   .admin-panel{padding:.85rem .8rem;}
   .login-card{padding:1.8rem 1.5rem;}
   .day-events{padding:4.5rem .5rem .6rem;}
+}
+@media(max-width:768px){
+  .calendar-wrap{overflow-x:auto;}
+  .calendar-grid{grid-template-columns:repeat(7,140px);min-width:max-content;}
 }
 </style>
 </head>
