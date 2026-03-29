@@ -185,27 +185,26 @@ select:focus{border-color:var(--accent);}
 
 /* ══ CALENDAR ══ */
 .calendar-wrap{
-  padding:.9rem 1rem;
+  overflow-x:auto;padding:.9rem 1rem;
   min-height:calc(100vh - 160px);
   padding-bottom:2rem;
   box-sizing:border-box;
-}
-.calendar-scroll{
-  overflow-x:auto;
 }
 .calendar-grid{
   display:grid;
   grid-template-columns:repeat(7,minmax(152px,1fr));
   gap:0;
   min-width:840px;
-  border:1px solid var(--border);
   box-sizing:border-box;
+  border:1px solid var(--border);
 }
 .day-col{
-  background:var(--surface);display:flex;flex-direction:column;
+  background:var(--surface);
+  display:flex;flex-direction:column;
   border-right:1px solid var(--border);
   border-bottom:1px solid var(--border);
   box-sizing:border-box;
+  min-width:0;
 }
 .day-col:last-child{border-right:none;}
 .day-header{padding:.6rem .7rem .5rem;background:var(--surface2);border-bottom:1px solid var(--border);position:sticky;top:54px;z-index:5;}
@@ -1247,7 +1246,7 @@ function renderCalendar(){
   const evsByDay={};
   DAYS.forEach(d=>evsByDay[d]=[]);
   (week.events||[]).forEach(ev=>{ if(evsByDay[ev.day]) evsByDay[ev.day].push(ev); });
-  let html=`<div class="calendar-scroll"><div class="calendar-grid">`;
+  let html=`<div class="calendar-grid">`;
   DAYS.forEach(day=>{
     const evs=evsByDay[day], total=evs.length;
     let pending=0;
@@ -1291,7 +1290,7 @@ function renderCalendar(){
     }
     html+=`</div></div>`;
   });
-  html+=`</div></div>`;
+  html+=`</div>`;
   wrap.innerHTML=html;
 }
 
