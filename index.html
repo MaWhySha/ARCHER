@@ -433,9 +433,9 @@ select:focus{border-color:var(--accent);}
   .login-card{padding:1.8rem 1.5rem;}
   .day-events{padding:4.5rem .5rem .6rem;}
 }
-@media(max-width:768px){
+@media(max-width:768px),(hover:none){
   .calendar-wrap{overflow-x:auto;}
-  .calendar-grid{grid-template-columns:repeat(7,160px);min-width:max-content;}
+  .calendar-grid{grid-template-columns:repeat(7,minmax(150px,max-content));min-width:max-content;}
 }
 </style>
 </head>
