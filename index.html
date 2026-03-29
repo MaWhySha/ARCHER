@@ -188,20 +188,18 @@ select:focus{border-color:var(--accent);}
   overflow-x:auto;padding:.9rem 1rem;
   min-height:calc(100vh - 160px);
   padding-bottom:2rem;
-  /* Ensure the right border of last column is always visible */
   box-sizing:border-box;
 }
 .calendar-grid{
   display:grid;
   grid-template-columns:repeat(7,minmax(152px,1fr));
   gap:0;
-  background:var(--bg);
-  border-top:1px solid var(--border);
-  border-left:1px solid var(--border);
-  border-right:1px solid var(--border);
+  background:var(--border);
+  outline:1px solid var(--border);
   min-width:840px;
 }
 .day-col{background:var(--surface);display:flex;flex-direction:column;border-right:1px solid var(--border);border-bottom:1px solid var(--border);}
+.day-col:last-child{border-right:none;}
 .day-header{padding:.6rem .7rem .5rem;background:var(--surface2);border-bottom:1px solid var(--border);position:sticky;top:54px;z-index:5;}
 .day-name{font-family:'Syne',sans-serif;font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--text2);}
 .day-stats{font-size:.6rem;color:var(--text3);margin-top:.1rem;line-height:1.4;}
@@ -424,10 +422,7 @@ select:focus{border-color:var(--accent);}
   .form-grid-3x2{grid-template-columns:1fr 1fr;}
   .topbar{height:auto;padding:.5rem .8rem;}
   .week-bar{padding:.55rem .8rem;}
-  /* Extra right padding so last column border always visible on mobile */
   .calendar-wrap{padding:.65rem 1rem 2rem;}
-  /* Ensure inner grid container has right margin to show last border */
-  .calendar-wrap > .calendar-grid{margin-right:1px;}
   .admin-panel{padding:.85rem .8rem;}
   .login-card{padding:1.8rem 1.5rem;}
   .day-events{padding:4.5rem .5rem .6rem;}
