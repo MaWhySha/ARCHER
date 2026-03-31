@@ -17,7 +17,7 @@
   --blue:#4da6ff;--blue-soft:rgba(77,166,255,.12);
   --purple:#c084fc;--purple-soft:rgba(192,132,252,.12);
   --clase:#4da6ff;--laboratorio:#c084fc;--parcial:#f25c5c;
-  --trabajo:#f5a623;--especial:#3ecf8e;
+  --trabajo:#f5a623;--especial:#3ecf8e;--asincrona:#f97316;
 }
 *{box-sizing:border-box;margin:0;padding:0;}
 body{font-family:'Instrument Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;}
@@ -222,6 +222,7 @@ select:focus{border-color:var(--accent);}
 .event-card[data-type="parcial"]{border-top-color:var(--parcial);}
 .event-card[data-type="trabajo"]{border-top-color:var(--trabajo);}
 .event-card[data-type="especial"]{border-top-color:var(--especial);}
+.event-card[data-type="asincrona"]{border-top-color:var(--asincrona);}
 .card-top{display:flex;align-items:center;justify-content:space-between;gap:.3rem;padding-right:2.8rem;}
 .event-type-pill{display:inline-flex;align-items:center;font-size:.56rem;font-weight:600;text-transform:uppercase;letter-spacing:.07em;padding:.12rem .4rem;border-radius:100px;flex-shrink:0;}
 .pill-clase{background:var(--blue-soft);color:var(--blue);}
@@ -229,6 +230,7 @@ select:focus{border-color:var(--accent);}
 .pill-parcial{background:var(--red-soft);color:var(--red);}
 .pill-trabajo{background:var(--amber-soft);color:var(--amber);}
 .pill-especial{background:var(--green-soft);color:var(--green);}
+.pill-asincrona{background:rgba(249,115,22,.12);color:#f97316;}
 .toggle-arrow{font-size:.55rem;color:var(--text3);cursor:pointer;transition:transform .2s;flex-shrink:0;padding:.1rem .15rem;}
 .toggle-arrow:hover{color:var(--text2);}
 .toggle-arrow.open{transform:rotate(180deg);}
@@ -562,7 +564,7 @@ select:focus{border-color:var(--accent);}
       </div>
       <div class="form-grid-3x2">
         <div class="form-field"><label>Tipo *</label>
-          <select id="ev-type"><option value="clase">Clase regular</option><option value="laboratorio">Laboratorio</option><option value="parcial">Parcial / Examen</option><option value="trabajo">Trabajo / Tarea</option><option value="especial">Evento especial</option></select>
+          <select id="ev-type"><option value="clase">Clase regular</option><option value="laboratorio">Laboratorio</option><option value="parcial">Parcial / Examen</option><option value="trabajo">Trabajo / Tarea</option><option value="especial">Evento especial</option><option value="asincrona">Asíncrona</option></select>
         </div>
         <div class="form-field"><label>Materia</label><select id="ev-subject"></select></div>
         <div class="form-field"><label>Día *</label>
@@ -602,7 +604,7 @@ select:focus{border-color:var(--accent);}
     </div>
     <div class="m-row full"><div class="m-field"><label>Título</label><input type="text" id="em-title"></div></div>
     <div class="m-row">
-      <div class="m-field"><label>Tipo</label><select id="em-type"><option value="clase">Clase regular</option><option value="laboratorio">Laboratorio</option><option value="parcial">Parcial / Examen</option><option value="trabajo">Trabajo / Tarea</option><option value="especial">Evento especial</option></select></div>
+      <div class="m-field"><label>Tipo</label><select id="em-type"><option value="clase">Clase regular</option><option value="laboratorio">Laboratorio</option><option value="parcial">Parcial / Examen</option><option value="trabajo">Trabajo / Tarea</option><option value="especial">Evento especial</option><option value="asincrona">Asíncrona</option></select></div>
       <div class="m-field"><label>Materia</label><select id="em-subject"></select></div>
     </div>
     <div class="m-row">
@@ -779,7 +781,7 @@ const provider = new GoogleAuthProvider();
 // ── Constants ──
 const ADMIN_EMAIL = "mawhysha@gmail.com";
 const DAYS        = ["Lunes","Martes","Miércoles","Jueves","Viernes","Sábado","Domingo"];
-const TYPE_LABELS = {clase:"Clase",laboratorio:"Lab",parcial:"Parcial",trabajo:"Trabajo",especial:"Especial"};
+const TYPE_LABELS = {clase:"Clase",laboratorio:"Lab",parcial:"Parcial",trabajo:"Trabajo",especial:"Especial",asincrona:"Asíncrona"};
 
 // ── State ──
 let currentUser   = null;   // Firebase Auth user object
