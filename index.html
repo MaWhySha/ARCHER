@@ -862,11 +862,15 @@ function listenStats(){
     barEl.className = 'stats-bar' + (pct >= 100 ? ' full' : pct >= 80 ? ' warn' : '');
     labelEl.innerHTML = `Usuarios: <strong>${total} / ${maxU}</strong>`;
 
-    // Si está lleno, ocultar opciones de login y mostrar bloqueo
+    // Si está lleno: bloquear solo acceso nuevo, nunca el perfil ya guardado
     if(total >= maxU){
-      document.getElementById('login-main-section').style.display  = 'none';
-      document.getElementById('saved-profile-section').style.display = 'none';
-      document.getElementById('limit-screen').style.display = 'block';
+      document.getElementById('login-main-section').style.display = 'none';
+      // Solo mostrar bloqueo si no hay perfil guardado
+      const hasSaved = document.getElementById('saved-profile-section').style.display !== 'none'
+                    || (typeof v4GetSavedProfile === 'function' && v4GetSavedProfile());
+      if(!hasSaved){
+        document.getElementById('limit-screen').style.display = 'block';
+      }
     } else {
       document.getElementById('limit-screen').style.display = 'none';
     }
