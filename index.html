@@ -1651,6 +1651,13 @@ window.v4ExecuteDelete = async function(){
     await remove(statusRef(currentUser.uid));
     await remove(colorRef(currentUser.uid));
   }catch(e){}
+  // Actualizar contador tras borrar perfil
+  try{
+    const usersSnap = await get(ref(db, 'users'));
+    const realCount = usersSnap.exists() ? Object.keys(usersSnap.val()).length : 0;
+    await set(userCountRef(), realCount);
+    await set(ref(db, 'stats/totalUsuarios'), realCount);
+  }catch(e){}
   v4ClearSavedProfile();
   closeOverlay('delete-final-overlay');
   closeOverlay('settings-overlay');
