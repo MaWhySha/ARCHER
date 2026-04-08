@@ -73,6 +73,23 @@ body{font-family:'Instrument Sans',sans-serif;background:var(--bg);color:var(--t
 .login-tagline{font-size:.63rem;color:var(--text3);letter-spacing:.06em;line-height:1.6;margin-bottom:2rem;}
 .login-tagline strong{color:var(--text2);font-weight:500;}
 
+/* ── Stats counter (nuevo) ── */
+.stats-counter{font-size:.65rem;color:var(--text3);margin-bottom:1.1rem;display:none;
+  background:var(--surface2);border:1px solid var(--border);padding:.45rem .75rem;border-radius:1px;
+  display:flex;align-items:center;gap:.5rem;}
+.stats-bar-wrap{flex:1;height:3px;background:var(--border2);border-radius:2px;overflow:hidden;}
+.stats-bar{height:100%;border-radius:2px;background:var(--green);transition:width .4s;}
+.stats-bar.warn{background:var(--amber);}
+.stats-bar.full{background:var(--red);}
+.stats-label{white-space:nowrap;font-size:.63rem;color:var(--text3);}
+.stats-label strong{color:var(--text2);}
+/* Pantalla de cupo lleno (nuevo) */
+.limit-screen{display:none;text-align:center;padding:1.5rem 0;}
+.limit-icon{font-size:2rem;margin-bottom:.5rem;}
+.limit-title{font-family:'Syne',sans-serif;font-size:.82rem;font-weight:700;
+  text-transform:uppercase;letter-spacing:.07em;color:var(--red);margin-bottom:.4rem;}
+.limit-msg{font-size:.73rem;color:var(--text3);line-height:1.55;}
+
 /* ── Connecting state ── */
 .connecting-state{text-align:center;padding:1.8rem 0;}
 .connecting-spinner{width:26px;height:26px;border:2px solid var(--border2);border-top-color:var(--accent);border-radius:50%;animation:spin .75s linear infinite;margin:0 auto .7rem;}
@@ -311,26 +328,7 @@ select:focus{border-color:var(--accent);}
 .screen-transition{position:fixed;inset:0;background:var(--bg);z-index:9999;opacity:0;pointer-events:none;transition:opacity .3s ease;}
 .screen-transition.active{opacity:1;pointer-events:all;}
 
-/* ── Slot counter ── */
-.slot-counter{
-  display:flex;align-items:center;gap:.55rem;
-  background:var(--surface2);border:1px solid var(--border);
-  padding:.45rem .75rem;border-radius:1px;margin-bottom:1rem;
-}
-.slot-bar-wrap{flex:1;height:4px;background:var(--border2);border-radius:2px;overflow:hidden;}
-.slot-bar{height:100%;border-radius:2px;background:var(--green);transition:width .4s ease;}
-.slot-bar.warn{background:var(--amber);}
-.slot-bar.full{background:var(--red);}
-.slot-text{font-size:.62rem;color:var(--text3);white-space:nowrap;}
-.slot-text strong{color:var(--text2);}
-/* Full screen shown when limit reached */
-.full-screen{
-  text-align:center;padding:1.8rem 0;display:none;
-}
-.full-icon{font-size:2rem;margin-bottom:.6rem;}
-.full-title{font-family:'Syne',sans-serif;font-size:.85rem;font-weight:700;
-  text-transform:uppercase;letter-spacing:.07em;color:var(--red);margin-bottom:.4rem;}
-.full-msg{font-size:.75rem;color:var(--text3);line-height:1.55;}
+/* ── V4: Saved profile quick-access ── */
 .saved-profile-section{display:none;}
 .saved-profile-label{font-size:.68rem;text-transform:uppercase;letter-spacing:.1em;color:var(--text3);margin-bottom:.7rem;}
 .saved-profile-btn{width:100%;display:flex;align-items:center;gap:.8rem;background:var(--surface2);border:1px solid var(--border);padding:.8rem 1rem;cursor:pointer;transition:border-color .15s,background .15s;margin-bottom:.5rem;border-radius:1px;}
@@ -483,17 +481,17 @@ select:focus{border-color:var(--accent);}
       de <strong>E</strong>valuación de <strong>R</strong>endimiento
     </div>
 
-    <!-- Slot counter -->
-    <div class="slot-counter" id="slot-counter" style="display:none">
-      <div class="slot-bar-wrap"><div class="slot-bar" id="slot-bar"></div></div>
-      <span class="slot-text" id="slot-text"><strong>…</strong></span>
+    <!-- Contador de usuarios en tiempo real (nuevo) -->
+    <div class="stats-counter" id="stats-counter">
+      <div class="stats-bar-wrap"><div class="stats-bar" id="stats-bar"></div></div>
+      <span class="stats-label" id="stats-label">Usuarios: <strong>…</strong></span>
     </div>
 
-    <!-- Full screen -->
-    <div class="full-screen" id="full-screen">
-      <div class="full-icon">🔒</div>
-      <div class="full-title">ARCHER está lleno</div>
-      <div class="full-msg">Se ha alcanzado el límite de usuarios registrados.<br>Contacta al administrador para obtener acceso.</div>
+    <!-- Pantalla de cupo lleno (nuevo) -->
+    <div class="limit-screen" id="limit-screen">
+      <div class="limit-icon">🔒</div>
+      <div class="limit-title">ARCHER está lleno</div>
+      <div class="limit-msg">Se alcanzó el límite de usuarios registrados.<br>Contacta al administrador para obtener acceso.</div>
     </div>
 
     <!-- V4: Saved profile quick-access (shown after logout when no active session) -->
@@ -791,7 +789,7 @@ import { initializeApp }
   from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged }
   from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { getDatabase, ref, onValue, set, remove, get }
+import { getDatabase, ref, onValue, set, remove, get, runTransaction }
   from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
 // ── Config ──
@@ -831,47 +829,48 @@ let verifyCode    = "";
 // ── DB refs ──
 const schedRef    = () => ref(db, 'schedule');
 const subjRef     = () => ref(db, 'subjects');
-const usersRef    = () => ref(db, 'users');
 const userRef     = (uid) => ref(db, `users/${uid}`);
 const statusRef   = (uid) => ref(db, `statuses/${uid}`);
 const colorRef    = (uid) => ref(db, `subjectColors/${uid}`);
-
-// ── User limit — cambia este número para ampliar o reducir el cupo ──
-const USER_LIMIT = 50;
-
-// ── Slot counter — muestra cupos en la pantalla de login ──
-async function loadSlotCounter(){
-  try{
-    const snap = await get(usersRef());
-    const count = snap.exists() ? Object.keys(snap.val()).length : 0;
-    const remaining = USER_LIMIT - count;
-    const pct = Math.min(100, Math.round((count / USER_LIMIT) * 100));
-
-    const counter = document.getElementById('slot-counter');
-    const bar     = document.getElementById('slot-bar');
-    const text    = document.getElementById('slot-text');
-
-    if(counter){
-      counter.style.display = 'flex';
-      bar.style.width = pct + '%';
-      bar.className = 'slot-bar' + (pct >= 100 ? ' full' : pct >= 80 ? ' warn' : '');
-      text.innerHTML = `<strong>${count}/${USER_LIMIT}</strong>&nbsp;cupos`;
-    }
-
-    // Si está lleno, ocultar botón de login y mostrar mensaje
-    if(remaining <= 0){
-      document.getElementById('login-main-section').style.display = 'none';
-      document.getElementById('saved-profile-section').style.display = 'none';
-      document.getElementById('full-screen').style.display = 'block';
-    }
-  }catch(e){}
-}
+// Stats ref (nuevo)
+const statsRef    = () => ref(db, 'stats');
 
 // ── Transition helper ──
 function transition(fn){
   const el = document.getElementById('screen-transition');
   el.classList.add('active');
   setTimeout(()=>{ fn(); setTimeout(()=>el.classList.remove('active'),300); }, 280);
+}
+
+// ── Stats listener en tiempo real (nuevo) ──
+let statsUnsub = null;
+function listenStats(){
+  if(statsUnsub){ statsUnsub(); statsUnsub=null; }
+  statsUnsub = onValue(statsRef(), snap=>{
+    const data   = snap.val() || {};
+    const total  = data.totalUsuarios || 0;
+    const maxU   = data.maxUsuarios   || 50;
+    const pct    = Math.min(100, Math.round((total / maxU) * 100));
+
+    const counterEl = document.getElementById('stats-counter');
+    const barEl     = document.getElementById('stats-bar');
+    const labelEl   = document.getElementById('stats-label');
+    if(!counterEl) return;
+
+    counterEl.style.display = 'flex';
+    barEl.style.width = pct + '%';
+    barEl.className = 'stats-bar' + (pct >= 100 ? ' full' : pct >= 80 ? ' warn' : '');
+    labelEl.innerHTML = `Usuarios: <strong>${total} / ${maxU}</strong>`;
+
+    // Si está lleno, ocultar opciones de login y mostrar bloqueo
+    if(total >= maxU){
+      document.getElementById('login-main-section').style.display  = 'none';
+      document.getElementById('saved-profile-section').style.display = 'none';
+      document.getElementById('limit-screen').style.display = 'block';
+    } else {
+      document.getElementById('limit-screen').style.display = 'none';
+    }
+  });
 }
 
 // ── Auth state listener ──
@@ -886,7 +885,7 @@ onAuthStateChanged(auth, async (user)=>{
     } else {
       showEl('login-main-section');
     }
-    loadSlotCounter(); // cargar cupos siempre que no haya sesión activa
+    listenStats(); // escuchar stats en tiempo real (nuevo)
     return;
   }
 
@@ -958,27 +957,34 @@ window.confirmDisplayName = async function(){
   if(name.length < 2){ showEl('name-error'); return; }
   hideEl('name-error');
 
-  // Verificar límite de usuarios antes de registrar
+  // Verificar límite antes de registrar (nuevo)
   try{
-    const snap = await get(usersRef());
-    const count = snap.exists() ? Object.keys(snap.val()).length : 0;
-    if(count >= USER_LIMIT){
-      // Límite alcanzado — cerrar sesión y mostrar mensaje
+    const snap  = await get(statsRef());
+    const data  = snap.val() || {};
+    const total = data.totalUsuarios || 0;
+    const maxU  = data.maxUsuarios   || 50;
+    if(total >= maxU){
       await signOut(auth);
       document.getElementById('name-setup-section').style.display = 'none';
-      document.getElementById('full-screen').style.display = 'block';
-      document.getElementById('slot-counter').style.display = 'flex';
+      document.getElementById('limit-screen').style.display = 'block';
+      listenStats();
       return;
     }
   }catch(e){}
 
   displayName = name;
+  // Crear perfil de usuario
   await set(userRef(currentUser.uid), {
     displayName: name,
     email: currentUser.email,
     photoURL: currentUser.photoURL || null,
     createdAt: Date.now()
   });
+  // Incrementar contador con runTransaction para evitar condiciones de carrera (nuevo)
+  try{
+    await runTransaction(ref(db, 'stats/totalUsuarios'), current => (current || 0) + 1);
+  }catch(e){}
+
   v4SetSavedProfile({name, email: currentUser.email, photo: currentUser.photoURL||null});
   transition(()=> startApp());
 };
@@ -991,9 +997,20 @@ window.cancelNameSetup = async function(){
 
 // ── App start ──
 function startApp(){
+  // Detener listener de stats al entrar a la app
+  if(statsUnsub){ statsUnsub(); statsUnsub=null; }
   document.getElementById('login-screen').style.display='none';
   document.getElementById('app').style.display='block';
   document.getElementById('app').style.animation='pageFadeIn .5s ease both';
+
+  // Inicializar nodo stats si no existe (solo admin, primera vez)
+  if(isAdmin){
+    get(statsRef()).then(snap=>{
+      if(!snap.exists()){
+        set(statsRef(), { maxUsuarios: 50, totalUsuarios: 0 });
+      }
+    }).catch(()=>{});
+  }
 
   if(isAdmin) document.getElementById('app').classList.add('is-admin');
   else        document.getElementById('app').classList.remove('is-admin');
