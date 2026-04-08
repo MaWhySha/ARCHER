@@ -1003,11 +1003,17 @@ function startApp(){
   document.getElementById('app').style.display='block';
   document.getElementById('app').style.animation='pageFadeIn .5s ease both';
 
-  // Inicializar nodo stats si no existe (solo admin, primera vez)
+  // Inicializar nodo stats si no existe — cuenta usuarios reales ya registrados (solo admin)
   if(isAdmin){
-    get(statsRef()).then(snap=>{
+    get(statsRef()).then(async snap=>{
       if(!snap.exists()){
-        set(statsRef(), { maxUsuarios: 50, totalUsuarios: 0 });
+        // Contar usuarios reales existentes en la DB
+        let realCount = 0;
+        try{
+          const usersSnap = await get(ref(db, 'users'));
+          if(usersSnap.exists()) realCount = Object.keys(usersSnap.val()).length;
+        }catch(e){}
+        await set(statsRef(), { maxUsuarios: 50, totalUsuarios: realCount });
       }
     }).catch(()=>{});
   }
