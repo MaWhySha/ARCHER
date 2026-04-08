@@ -984,9 +984,11 @@ window.confirmDisplayName = async function(){
     photoURL: currentUser.photoURL || null,
     createdAt: Date.now()
   });
-  // Incrementar contador con runTransaction para evitar condiciones de carrera (nuevo)
+  // Sincronizar totalUsuarios con el conteo real de users (siempre exacto)
   try{
-    await runTransaction(ref(db, 'stats/totalUsuarios'), current => (current || 0) + 1);
+    const usersSnap = await get(ref(db, 'users'));
+    const realCount = usersSnap.exists() ? Object.keys(usersSnap.val()).length : 1;
+    await set(ref(db, 'stats/totalUsuarios'), realCount);
   }catch(e){}
 
   v4SetSavedProfile({name, email: currentUser.email, photo: currentUser.photoURL||null});
