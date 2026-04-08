@@ -827,13 +827,13 @@ let schedUnsub    = null, statusUnsub = null, colorUnsub = null;
 let verifyCode    = "";
 
 // ── DB refs ──
-const schedRef    = () => ref(db, 'schedule');
-const subjRef     = () => ref(db, 'subjects');
-const userRef     = (uid) => ref(db, `users/${uid}`);
-const statusRef   = (uid) => ref(db, `statuses/${uid}`);
-const colorRef    = (uid) => ref(db, `subjectColors/${uid}`);
-// Stats ref (nuevo)
-const statsRef    = () => ref(db, 'stats');
+const schedRef      = () => ref(db, 'schedule');
+const subjRef       = () => ref(db, 'subjects');
+const userRef       = (uid) => ref(db, `users/${uid}`);
+const statusRef     = (uid) => ref(db, `statuses/${uid}`);
+const colorRef      = (uid) => ref(db, `subjectColors/${uid}`);
+const statsRef      = () => ref(db, 'stats');
+const userCountRef  = () => ref(db, 'userCount'); // nodo público solo con el número, sin datos sensibles
 
 // ── Transition helper ──
 function transition(fn){
@@ -842,16 +842,14 @@ function transition(fn){
   setTimeout(()=>{ fn(); setTimeout(()=>el.classList.remove('active'),300); }, 280);
 }
 
-// ── Stats listener en tiempo real (nuevo) ──
-let statsUnsub  = null;
-let usersUnsub  = null;
-let _maxUsuarios = 50;
-let _totalUsuarios = 0;
+// ── Stats listener en tiempo real ──
+let statsUnsub    = null;
+let ucUnsub       = null;
+let _maxU         = 50;
+let _totalU       = 0;
 
-function _renderStatsUI(){
-  const total = _totalUsuarios;
-  const maxU  = _maxUsuarios;
-  const pct   = Math.min(100, Math.round((total / maxU) * 100));
+function _renderCounter(){
+  const pct = Math.min(100, Math.round((_totalU / _maxU) * 100));
   const counterEl = document.getElementById('stats-counter');
   const barEl     = document.getElementById('stats-bar');
   const labelEl   = document.getElementById('stats-label');
@@ -859,8 +857,8 @@ function _renderStatsUI(){
   counterEl.style.display = 'flex';
   barEl.style.width = pct + '%';
   barEl.className = 'stats-bar' + (pct >= 100 ? ' full' : pct >= 80 ? ' warn' : '');
-  labelEl.innerHTML = `Usuarios: <strong>${total} / ${maxU}</strong>`;
-  if(total >= maxU){
+  labelEl.innerHTML = `Usuarios: <strong>${_totalU} / ${_maxU}</strong>`;
+  if(_totalU >= _maxU){
     document.getElementById('login-main-section').style.display = 'none';
     const hasSaved = document.getElementById('saved-profile-section').style.display !== 'none'
                   || (typeof v4GetSavedProfile === 'function' && v4GetSavedProfile());
@@ -871,17 +869,17 @@ function _renderStatsUI(){
 }
 
 function listenStats(){
-  // Escuchar maxUsuarios desde stats/
+  // Listener 1: userCount — nodo público, solo un número, sin datos sensibles
+  if(ucUnsub){ ucUnsub(); ucUnsub=null; }
+  ucUnsub = onValue(userCountRef(), snap=>{
+    _totalU = snap.exists() ? (snap.val() || 0) : 0;
+    _renderCounter();
+  });
+  // Listener 2: stats/maxUsuarios — límite configurable por admin
   if(statsUnsub){ statsUnsub(); statsUnsub=null; }
   statsUnsub = onValue(statsRef(), snap=>{
-    _maxUsuarios = (snap.val() || {}).maxUsuarios || 50;
-    _renderStatsUI();
-  });
-  // Escuchar /users directamente — fuente de verdad para el conteo
-  if(usersUnsub){ usersUnsub(); usersUnsub=null; }
-  usersUnsub = onValue(ref(db, 'users'), snap=>{
-    _totalUsuarios = snap.exists() ? Object.keys(snap.val()).length : 0;
-    _renderStatsUI();
+    _maxU = (snap.val() || {}).maxUsuarios || 50;
+    _renderCounter();
   });
 }
 
@@ -969,13 +967,13 @@ window.confirmDisplayName = async function(){
   if(name.length < 2){ showEl('name-error'); return; }
   hideEl('name-error');
 
-  // Verificar límite leyendo /users directamente (fuente de verdad)
+  // Verificar límite leyendo userCount (nodo público) + maxUsuarios
   try{
-    const usersSnap = await get(ref(db, 'users'));
-    const realTotal = usersSnap.exists() ? Object.keys(usersSnap.val()).length : 0;
+    const ucSnap    = await get(userCountRef());
+    const current   = ucSnap.exists() ? (ucSnap.val() || 0) : 0;
     const statsSnap = await get(statsRef());
     const maxU      = (statsSnap.val() || {}).maxUsuarios || 50;
-    if(realTotal >= maxU){
+    if(current >= maxU){
       await signOut(auth);
       document.getElementById('name-setup-section').style.display = 'none';
       document.getElementById('limit-screen').style.display = 'block';
@@ -985,12 +983,20 @@ window.confirmDisplayName = async function(){
   }catch(e){}
 
   displayName = name;
+  // Crear perfil de usuario
   await set(userRef(currentUser.uid), {
     displayName: name,
     email: currentUser.email,
     photoURL: currentUser.photoURL || null,
     createdAt: Date.now()
   });
+  // Actualizar userCount y stats/totalUsuarios con el conteo real de /users
+  try{
+    const usersSnap = await get(ref(db, 'users'));
+    const realCount = usersSnap.exists() ? Object.keys(usersSnap.val()).length : 1;
+    await set(userCountRef(), realCount);
+    await set(ref(db, 'stats/totalUsuarios'), realCount);
+  }catch(e){}
 
   v4SetSavedProfile({name, email: currentUser.email, photo: currentUser.photoURL||null});
   transition(()=> startApp());
@@ -1006,23 +1012,27 @@ window.cancelNameSetup = async function(){
 function startApp(){
   // Detener listeners de stats al entrar a la app
   if(statsUnsub){ statsUnsub(); statsUnsub=null; }
-  if(usersUnsub){ usersUnsub(); usersUnsub=null; }
+  if(ucUnsub){ ucUnsub(); ucUnsub=null; }
   document.getElementById('login-screen').style.display='none';
   document.getElementById('app').style.display='block';
   document.getElementById('app').style.animation='pageFadeIn .5s ease both';
 
-  // Inicializar nodo stats si no existe — cuenta usuarios reales ya registrados (solo admin)
+  // Inicializar stats y userCount si no existen (solo admin, primera vez)
   if(isAdmin){
     get(statsRef()).then(async snap=>{
+      let realCount = 0;
+      try{
+        const usersSnap = await get(ref(db, 'users'));
+        if(usersSnap.exists()) realCount = Object.keys(usersSnap.val()).length;
+      }catch(e){}
       if(!snap.exists()){
-        // Contar usuarios reales existentes en la DB
-        let realCount = 0;
-        try{
-          const usersSnap = await get(ref(db, 'users'));
-          if(usersSnap.exists()) realCount = Object.keys(usersSnap.val()).length;
-        }catch(e){}
         await set(statsRef(), { maxUsuarios: 50, totalUsuarios: realCount });
+      } else {
+        // Sincronizar totalUsuarios con el real
+        await set(ref(db, 'stats/totalUsuarios'), realCount);
       }
+      // Siempre sincronizar userCount con el real al entrar el admin
+      await set(userCountRef(), realCount);
     }).catch(()=>{});
   }
 
