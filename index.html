@@ -846,11 +846,19 @@ function transition(fn){
 let statsUnsub = null;
 function listenStats(){
   if(statsUnsub){ statsUnsub(); statsUnsub=null; }
-  statsUnsub = onValue(statsRef(), snap=>{
-    const data   = snap.val() || {};
-    const total  = data.totalUsuarios || 0;
-    const maxU   = data.maxUsuarios   || 50;
-    const pct    = Math.min(100, Math.round((total / maxU) * 100));
+  // Escuchar maxUsuarios desde stats, y contar /users como fuente de verdad
+  statsUnsub = onValue(statsRef(), async snap=>{
+    const data = snap.val() || {};
+    const maxU = data.maxUsuarios || 50;
+
+    // Contar usuarios reales desde /users (fuente de verdad)
+    let total = 0;
+    try{
+      const usersSnap = await get(ref(db, 'users'));
+      if(usersSnap.exists()) total = Object.keys(usersSnap.val()).length;
+    }catch(e){}
+
+    const pct = Math.min(100, Math.round((total / maxU) * 100));
 
     const counterEl = document.getElementById('stats-counter');
     const barEl     = document.getElementById('stats-bar');
@@ -865,7 +873,6 @@ function listenStats(){
     // Si está lleno: bloquear solo acceso nuevo, nunca el perfil ya guardado
     if(total >= maxU){
       document.getElementById('login-main-section').style.display = 'none';
-      // Solo mostrar bloqueo si no hay perfil guardado
       const hasSaved = document.getElementById('saved-profile-section').style.display !== 'none'
                     || (typeof v4GetSavedProfile === 'function' && v4GetSavedProfile());
       if(!hasSaved){
@@ -961,13 +968,13 @@ window.confirmDisplayName = async function(){
   if(name.length < 2){ showEl('name-error'); return; }
   hideEl('name-error');
 
-  // Verificar límite antes de registrar (nuevo)
+  // Verificar límite usando /users como fuente de verdad (no stats/totalUsuarios)
   try{
-    const snap  = await get(statsRef());
-    const data  = snap.val() || {};
-    const total = data.totalUsuarios || 0;
-    const maxU  = data.maxUsuarios   || 50;
-    if(total >= maxU){
+    const usersSnap = await get(ref(db, 'users'));
+    const realTotal = usersSnap.exists() ? Object.keys(usersSnap.val()).length : 0;
+    const statsSnap = await get(statsRef());
+    const maxU      = (statsSnap.val() || {}).maxUsuarios || 50;
+    if(realTotal >= maxU){
       await signOut(auth);
       document.getElementById('name-setup-section').style.display = 'none';
       document.getElementById('limit-screen').style.display = 'block';
@@ -984,7 +991,7 @@ window.confirmDisplayName = async function(){
     photoURL: currentUser.photoURL || null,
     createdAt: Date.now()
   });
-  // Sincronizar totalUsuarios con el conteo real de users (siempre exacto)
+  // Actualizar totalUsuarios como valor visual (fuente de verdad sigue siendo /users)
   try{
     const usersSnap = await get(ref(db, 'users'));
     const realCount = usersSnap.exists() ? Object.keys(usersSnap.val()).length : 1;
