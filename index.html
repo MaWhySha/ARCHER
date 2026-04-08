@@ -843,44 +843,45 @@ function transition(fn){
 }
 
 // ── Stats listener en tiempo real (nuevo) ──
-let statsUnsub = null;
+let statsUnsub  = null;
+let usersUnsub  = null;
+let _maxUsuarios = 50;
+let _totalUsuarios = 0;
+
+function _renderStatsUI(){
+  const total = _totalUsuarios;
+  const maxU  = _maxUsuarios;
+  const pct   = Math.min(100, Math.round((total / maxU) * 100));
+  const counterEl = document.getElementById('stats-counter');
+  const barEl     = document.getElementById('stats-bar');
+  const labelEl   = document.getElementById('stats-label');
+  if(!counterEl) return;
+  counterEl.style.display = 'flex';
+  barEl.style.width = pct + '%';
+  barEl.className = 'stats-bar' + (pct >= 100 ? ' full' : pct >= 80 ? ' warn' : '');
+  labelEl.innerHTML = `Usuarios: <strong>${total} / ${maxU}</strong>`;
+  if(total >= maxU){
+    document.getElementById('login-main-section').style.display = 'none';
+    const hasSaved = document.getElementById('saved-profile-section').style.display !== 'none'
+                  || (typeof v4GetSavedProfile === 'function' && v4GetSavedProfile());
+    if(!hasSaved) document.getElementById('limit-screen').style.display = 'block';
+  } else {
+    document.getElementById('limit-screen').style.display = 'none';
+  }
+}
+
 function listenStats(){
+  // Escuchar maxUsuarios desde stats/
   if(statsUnsub){ statsUnsub(); statsUnsub=null; }
-  // Escuchar maxUsuarios desde stats, y contar /users como fuente de verdad
-  statsUnsub = onValue(statsRef(), async snap=>{
-    const data = snap.val() || {};
-    const maxU = data.maxUsuarios || 50;
-
-    // Contar usuarios reales desde /users (fuente de verdad)
-    let total = 0;
-    try{
-      const usersSnap = await get(ref(db, 'users'));
-      if(usersSnap.exists()) total = Object.keys(usersSnap.val()).length;
-    }catch(e){}
-
-    const pct = Math.min(100, Math.round((total / maxU) * 100));
-
-    const counterEl = document.getElementById('stats-counter');
-    const barEl     = document.getElementById('stats-bar');
-    const labelEl   = document.getElementById('stats-label');
-    if(!counterEl) return;
-
-    counterEl.style.display = 'flex';
-    barEl.style.width = pct + '%';
-    barEl.className = 'stats-bar' + (pct >= 100 ? ' full' : pct >= 80 ? ' warn' : '');
-    labelEl.innerHTML = `Usuarios: <strong>${total} / ${maxU}</strong>`;
-
-    // Si está lleno: bloquear solo acceso nuevo, nunca el perfil ya guardado
-    if(total >= maxU){
-      document.getElementById('login-main-section').style.display = 'none';
-      const hasSaved = document.getElementById('saved-profile-section').style.display !== 'none'
-                    || (typeof v4GetSavedProfile === 'function' && v4GetSavedProfile());
-      if(!hasSaved){
-        document.getElementById('limit-screen').style.display = 'block';
-      }
-    } else {
-      document.getElementById('limit-screen').style.display = 'none';
-    }
+  statsUnsub = onValue(statsRef(), snap=>{
+    _maxUsuarios = (snap.val() || {}).maxUsuarios || 50;
+    _renderStatsUI();
+  });
+  // Escuchar /users directamente — fuente de verdad para el conteo
+  if(usersUnsub){ usersUnsub(); usersUnsub=null; }
+  usersUnsub = onValue(ref(db, 'users'), snap=>{
+    _totalUsuarios = snap.exists() ? Object.keys(snap.val()).length : 0;
+    _renderStatsUI();
   });
 }
 
@@ -968,7 +969,7 @@ window.confirmDisplayName = async function(){
   if(name.length < 2){ showEl('name-error'); return; }
   hideEl('name-error');
 
-  // Verificar límite usando /users como fuente de verdad (no stats/totalUsuarios)
+  // Verificar límite leyendo /users directamente (fuente de verdad)
   try{
     const usersSnap = await get(ref(db, 'users'));
     const realTotal = usersSnap.exists() ? Object.keys(usersSnap.val()).length : 0;
@@ -984,19 +985,12 @@ window.confirmDisplayName = async function(){
   }catch(e){}
 
   displayName = name;
-  // Crear perfil de usuario
   await set(userRef(currentUser.uid), {
     displayName: name,
     email: currentUser.email,
     photoURL: currentUser.photoURL || null,
     createdAt: Date.now()
   });
-  // Actualizar totalUsuarios como valor visual (fuente de verdad sigue siendo /users)
-  try{
-    const usersSnap = await get(ref(db, 'users'));
-    const realCount = usersSnap.exists() ? Object.keys(usersSnap.val()).length : 1;
-    await set(ref(db, 'stats/totalUsuarios'), realCount);
-  }catch(e){}
 
   v4SetSavedProfile({name, email: currentUser.email, photo: currentUser.photoURL||null});
   transition(()=> startApp());
@@ -1010,8 +1004,9 @@ window.cancelNameSetup = async function(){
 
 // ── App start ──
 function startApp(){
-  // Detener listener de stats al entrar a la app
+  // Detener listeners de stats al entrar a la app
   if(statsUnsub){ statsUnsub(); statsUnsub=null; }
+  if(usersUnsub){ usersUnsub(); usersUnsub=null; }
   document.getElementById('login-screen').style.display='none';
   document.getElementById('app').style.display='block';
   document.getElementById('app').style.animation='pageFadeIn .5s ease both';
