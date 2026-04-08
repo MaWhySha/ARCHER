@@ -311,7 +311,26 @@ select:focus{border-color:var(--accent);}
 .screen-transition{position:fixed;inset:0;background:var(--bg);z-index:9999;opacity:0;pointer-events:none;transition:opacity .3s ease;}
 .screen-transition.active{opacity:1;pointer-events:all;}
 
-/* ── V4: Saved profile quick-access ── */
+/* ── Slot counter ── */
+.slot-counter{
+  display:flex;align-items:center;gap:.55rem;
+  background:var(--surface2);border:1px solid var(--border);
+  padding:.45rem .75rem;border-radius:1px;margin-bottom:1rem;
+}
+.slot-bar-wrap{flex:1;height:4px;background:var(--border2);border-radius:2px;overflow:hidden;}
+.slot-bar{height:100%;border-radius:2px;background:var(--green);transition:width .4s ease;}
+.slot-bar.warn{background:var(--amber);}
+.slot-bar.full{background:var(--red);}
+.slot-text{font-size:.62rem;color:var(--text3);white-space:nowrap;}
+.slot-text strong{color:var(--text2);}
+/* Full screen shown when limit reached */
+.full-screen{
+  text-align:center;padding:1.8rem 0;display:none;
+}
+.full-icon{font-size:2rem;margin-bottom:.6rem;}
+.full-title{font-family:'Syne',sans-serif;font-size:.85rem;font-weight:700;
+  text-transform:uppercase;letter-spacing:.07em;color:var(--red);margin-bottom:.4rem;}
+.full-msg{font-size:.75rem;color:var(--text3);line-height:1.55;}
 .saved-profile-section{display:none;}
 .saved-profile-label{font-size:.68rem;text-transform:uppercase;letter-spacing:.1em;color:var(--text3);margin-bottom:.7rem;}
 .saved-profile-btn{width:100%;display:flex;align-items:center;gap:.8rem;background:var(--surface2);border:1px solid var(--border);padding:.8rem 1rem;cursor:pointer;transition:border-color .15s,background .15s;margin-bottom:.5rem;border-radius:1px;}
@@ -462,6 +481,19 @@ select:focus{border-color:var(--accent);}
     <div class="login-tagline">
       <strong>A</strong>sistente de <strong>R</strong>egistro, <strong>C</strong>ontrol y <strong>H</strong>erramientas<br>
       de <strong>E</strong>valuación de <strong>R</strong>endimiento
+    </div>
+
+    <!-- Slot counter -->
+    <div class="slot-counter" id="slot-counter" style="display:none">
+      <div class="slot-bar-wrap"><div class="slot-bar" id="slot-bar"></div></div>
+      <span class="slot-text" id="slot-text"><strong>…</strong></span>
+    </div>
+
+    <!-- Full screen -->
+    <div class="full-screen" id="full-screen">
+      <div class="full-icon">🔒</div>
+      <div class="full-title">ARCHER está lleno</div>
+      <div class="full-msg">Se ha alcanzado el límite de usuarios registrados.<br>Contacta al administrador para obtener acceso.</div>
     </div>
 
     <!-- V4: Saved profile quick-access (shown after logout when no active session) -->
@@ -799,9 +831,41 @@ let verifyCode    = "";
 // ── DB refs ──
 const schedRef    = () => ref(db, 'schedule');
 const subjRef     = () => ref(db, 'subjects');
+const usersRef    = () => ref(db, 'users');
 const userRef     = (uid) => ref(db, `users/${uid}`);
 const statusRef   = (uid) => ref(db, `statuses/${uid}`);
 const colorRef    = (uid) => ref(db, `subjectColors/${uid}`);
+
+// ── User limit — cambia este número para ampliar o reducir el cupo ──
+const USER_LIMIT = 50;
+
+// ── Slot counter — muestra cupos en la pantalla de login ──
+async function loadSlotCounter(){
+  try{
+    const snap = await get(usersRef());
+    const count = snap.exists() ? Object.keys(snap.val()).length : 0;
+    const remaining = USER_LIMIT - count;
+    const pct = Math.min(100, Math.round((count / USER_LIMIT) * 100));
+
+    const counter = document.getElementById('slot-counter');
+    const bar     = document.getElementById('slot-bar');
+    const text    = document.getElementById('slot-text');
+
+    if(counter){
+      counter.style.display = 'flex';
+      bar.style.width = pct + '%';
+      bar.className = 'slot-bar' + (pct >= 100 ? ' full' : pct >= 80 ? ' warn' : '');
+      text.innerHTML = `<strong>${count}/${USER_LIMIT}</strong>&nbsp;cupos`;
+    }
+
+    // Si está lleno, ocultar botón de login y mostrar mensaje
+    if(remaining <= 0){
+      document.getElementById('login-main-section').style.display = 'none';
+      document.getElementById('saved-profile-section').style.display = 'none';
+      document.getElementById('full-screen').style.display = 'block';
+    }
+  }catch(e){}
+}
 
 // ── Transition helper ──
 function transition(fn){
@@ -822,6 +886,7 @@ onAuthStateChanged(auth, async (user)=>{
     } else {
       showEl('login-main-section');
     }
+    loadSlotCounter(); // cargar cupos siempre que no haya sesión activa
     return;
   }
 
@@ -892,6 +957,21 @@ window.confirmDisplayName = async function(){
   const name = document.getElementById('display-name-input').value.trim();
   if(name.length < 2){ showEl('name-error'); return; }
   hideEl('name-error');
+
+  // Verificar límite de usuarios antes de registrar
+  try{
+    const snap = await get(usersRef());
+    const count = snap.exists() ? Object.keys(snap.val()).length : 0;
+    if(count >= USER_LIMIT){
+      // Límite alcanzado — cerrar sesión y mostrar mensaje
+      await signOut(auth);
+      document.getElementById('name-setup-section').style.display = 'none';
+      document.getElementById('full-screen').style.display = 'block';
+      document.getElementById('slot-counter').style.display = 'flex';
+      return;
+    }
+  }catch(e){}
+
   displayName = name;
   await set(userRef(currentUser.uid), {
     displayName: name,
