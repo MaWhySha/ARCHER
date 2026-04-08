@@ -983,19 +983,18 @@ window.confirmDisplayName = async function(){
   }catch(e){}
 
   displayName = name;
-  // Crear perfil de usuario
+  // 1. Guardar perfil en /users/{uid}
   await set(userRef(currentUser.uid), {
     displayName: name,
     email: currentUser.email,
     photoURL: currentUser.photoURL || null,
     createdAt: Date.now()
   });
-  // Actualizar userCount y stats/totalUsuarios con el conteo real de /users
+  // 2. Incrementar userCount con transaction (atómico, evita condiciones de carrera)
   try{
-    const usersSnap = await get(ref(db, 'users'));
-    const realCount = usersSnap.exists() ? Object.keys(usersSnap.val()).length : 1;
-    await set(userCountRef(), realCount);
-    await set(ref(db, 'stats/totalUsuarios'), realCount);
+    await runTransaction(userCountRef(), current => Math.max(0, (current || 0) + 1));
+    const ucSnap = await get(userCountRef());
+    await set(ref(db, 'stats/totalUsuarios'), ucSnap.val() || 0);
   }catch(e){}
 
   v4SetSavedProfile({name, email: currentUser.email, photo: currentUser.photoURL||null});
@@ -1017,20 +1016,16 @@ function startApp(){
   document.getElementById('app').style.display='block';
   document.getElementById('app').style.animation='pageFadeIn .5s ease both';
 
-  // Sincronizar userCount con el conteo real de /users cada vez que alguien entra
-  // Esto garantiza que el contador sea siempre exacto sin importar qué pasó antes
-  get(ref(db, 'users')).then(async usersSnap=>{
-    const realCount = usersSnap.exists() ? Object.keys(usersSnap.val()).length : 0;
-    await set(userCountRef(), realCount);
-    await set(ref(db, 'stats/totalUsuarios'), realCount);
-    // Si es admin y stats no existe, inicializarlo
-    if(isAdmin){
-      const statsSnap = await get(statsRef());
-      if(!statsSnap.exists()){
-        await set(statsRef(), { maxUsuarios: 50, totalUsuarios: realCount });
+  // Inicializar stats si no existe (solo admin, primera vez)
+  if(isAdmin){
+    get(statsRef()).then(async snap=>{
+      if(!snap.exists()){
+        const ucSnap = await get(userCountRef());
+        const count  = ucSnap.exists() ? (ucSnap.val() || 0) : 0;
+        await set(statsRef(), { maxUsuarios: 50, totalUsuarios: count });
       }
-    }
-  }).catch(()=>{});
+    }).catch(()=>{});
+  }
 
   if(isAdmin) document.getElementById('app').classList.add('is-admin');
   else        document.getElementById('app').classList.remove('is-admin');
@@ -1642,17 +1637,17 @@ window.openSettings = function(){
 
 // ── V4 Execute final delete ──
 window.v4ExecuteDelete = async function(){
+  // 1. Decrementar userCount con transaction antes de borrar
+  try{
+    await runTransaction(userCountRef(), current => Math.max(0, (current || 1) - 1));
+    const ucSnap = await get(userCountRef());
+    await set(ref(db, 'stats/totalUsuarios'), ucSnap.val() || 0);
+  }catch(e){}
+  // 2. Borrar datos del usuario
   try{
     await remove(userRef(currentUser.uid));
     await remove(statusRef(currentUser.uid));
     await remove(colorRef(currentUser.uid));
-  }catch(e){}
-  // Actualizar contador tras borrar perfil
-  try{
-    const usersSnap = await get(ref(db, 'users'));
-    const realCount = usersSnap.exists() ? Object.keys(usersSnap.val()).length : 0;
-    await set(userCountRef(), realCount);
-    await set(ref(db, 'stats/totalUsuarios'), realCount);
   }catch(e){}
   v4ClearSavedProfile();
   closeOverlay('delete-final-overlay');
