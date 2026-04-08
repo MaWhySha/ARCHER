@@ -1017,24 +1017,20 @@ function startApp(){
   document.getElementById('app').style.display='block';
   document.getElementById('app').style.animation='pageFadeIn .5s ease both';
 
-  // Inicializar stats y userCount si no existen (solo admin, primera vez)
-  if(isAdmin){
-    get(statsRef()).then(async snap=>{
-      let realCount = 0;
-      try{
-        const usersSnap = await get(ref(db, 'users'));
-        if(usersSnap.exists()) realCount = Object.keys(usersSnap.val()).length;
-      }catch(e){}
-      if(!snap.exists()){
+  // Sincronizar userCount con el conteo real de /users cada vez que alguien entra
+  // Esto garantiza que el contador sea siempre exacto sin importar qué pasó antes
+  get(ref(db, 'users')).then(async usersSnap=>{
+    const realCount = usersSnap.exists() ? Object.keys(usersSnap.val()).length : 0;
+    await set(userCountRef(), realCount);
+    await set(ref(db, 'stats/totalUsuarios'), realCount);
+    // Si es admin y stats no existe, inicializarlo
+    if(isAdmin){
+      const statsSnap = await get(statsRef());
+      if(!statsSnap.exists()){
         await set(statsRef(), { maxUsuarios: 50, totalUsuarios: realCount });
-      } else {
-        // Sincronizar totalUsuarios con el real
-        await set(ref(db, 'stats/totalUsuarios'), realCount);
       }
-      // Siempre sincronizar userCount con el real al entrar el admin
-      await set(userCountRef(), realCount);
-    }).catch(()=>{});
-  }
+    }
+  }).catch(()=>{});
 
   if(isAdmin) document.getElementById('app').classList.add('is-admin');
   else        document.getElementById('app').classList.remove('is-admin');
